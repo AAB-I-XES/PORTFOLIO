@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Syne", sans-serif;
+  
+  --color-beige-soft: #f5f2ed;
+  --color-beige-dark: #E6DFD3;
+  --color-pink-soft: #fcebeb;
+  --color-pink-bright: #ffd6e0;
+  --color-brand-black: #141414;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f5f2ed;
+}
+::-webkit-scrollbar-thumb {
+  background: #141414;
+  border-radius: 3px;
+}
+
+/* Selection colors */
+::selection {
+  background-color: #ffd6e0;
+  color: #141414;
+}
+
+/* Custom visual utilities */
+.text-stroke-black {
+  -webkit-text-stroke: 2px #141414;
+  color: transparent;
+}
+
+.text-stroke-black-thin {
+  -webkit-text-stroke: 1px #141414;
+  color: transparent;
+}
+
+.text-stroke-pink {
+  -webkit-text-stroke: 2px #ffd6e0;
+  color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Hand-Drawn Sketch Grid or Background Dots - with pink dot variant */
+.sketch-grid {
+  background-image: radial-gradient(#ffd6e0 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+}
+
+.sketch-grid-dark {
+  background-image: radial-gradient(rgba(20, 20, 20, 0.05) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+}
+
+.line-drawing {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 2.5s ease-out forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
