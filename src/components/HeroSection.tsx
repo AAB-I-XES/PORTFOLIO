@@ -176,10 +176,10 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
             >
               <div className="flex items-center gap-1.5 mb-1">
                 <div className="w-2 h-2 rounded-full bg-[#141414] animate-ping" />
-                <span className="font-mono text-[8px] font-black tracking-widest text-[#141414]/50">ENGINE_ACTV</span>
+                <span className="font-mono text-[8px] font-black tracking-widest text-[#141414]/50">WHO_AM_I</span>
               </div>
               <span className="font-sans text-[10px] font-bold text-[#141414] leading-tight">
-                Procedural Brush Mechanics
+                Guwahati-based creative coder designing interactive systems &amp; art.
               </span>
             </motion.div>
           </div>
@@ -253,7 +253,6 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
               {localTime || "00:00:00"}
             </span>
           </div>
-          <span>Ref: PORTFOLIO_V2.6.0</span>
         </div>
       </motion.div>
     </section>

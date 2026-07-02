@@ -41,7 +41,7 @@ export default function Footer({ onScrollToTop }: FooterProps) {
             </span>
             <div className="flex flex-wrap gap-4 font-mono text-xs text-[#ffd6e0] font-bold">
               <a
-                href="https://github.com"
+                href="https://github.com/AAB-I-XES"
                 target="_blank"
                 referrerPolicy="no-referrer"
                 className="hover:text-white transition-colors"
@@ -49,7 +49,7 @@ export default function Footer({ onScrollToTop }: FooterProps) {
                 [ GITHUB &rarr; ]
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/dibyajyoti-rabha-250671391"
                 target="_blank"
                 referrerPolicy="no-referrer"
                 className="hover:text-white transition-colors"
