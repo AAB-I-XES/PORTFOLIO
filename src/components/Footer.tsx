@@ -57,7 +57,7 @@ export default function Footer({ onScrollToTop }: FooterProps) {
                 [ LINKEDIN &rarr; ]
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/RabhaDibya77515"
                 target="_blank"
                 referrerPolicy="no-referrer"
                 className="hover:text-white transition-colors"
