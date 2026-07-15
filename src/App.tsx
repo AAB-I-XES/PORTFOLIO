@@ -49,6 +49,10 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-[#111111] overflow-hidden select-none">
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="animated-gradient-background absolute inset-0" />
+      </div>
+
       {/* 1. Loading Preloader Screen */}
       <LoadingScreen 
         onComplete={() => setIsLoading(false)} 

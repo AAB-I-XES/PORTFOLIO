@@ -191,21 +191,6 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
               </motion.span>
             </h1>
 
-            {/* Accent Floating Drafting Indicator Box */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1.6, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -right-12 sm:-right-24 top-[35%] hidden md:flex flex-col items-start p-3 bg-[#fcebeb] border border-[#141414] rounded-xl shadow-[4px_4px_0px_#141414] max-w-[140px] text-left rotate-6"
-            >
-              <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-2 h-2 rounded-full bg-[#141414] animate-ping" />
-                <span className="font-mono text-[8px] font-black tracking-widest text-[#141414]/50">WHO_AM_I</span>
-              </div>
-              <span className="font-sans text-[10px] font-bold text-[#141414] leading-tight">
-                Guwahati-based creative coder designing interactive systems &amp; art.
-              </span>
-            </motion.div>
           </div>
 
           {/* DRAFTING RULER DIVIDER Ticks */}
