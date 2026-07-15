@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowDown, Compass, Navigation, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
-import heroBg from "../../assets/hero-bg.png";
 import ovcharBg from "../../assets/ovchar.png";
 
 interface HeroSectionProps {
@@ -63,7 +62,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
       id="hero"
       onMouseMove={handleMouseMove}
       style={{
-        backgroundImage: `url(${heroBg})`,
+        backgroundImage: `url(${ovcharBg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat"
