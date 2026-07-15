@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowDown, Compass, Navigation, Cpu, Sparkles, Globe } from "lucide-react";
+import { ArrowDown, Compass, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
 import ovcharBg from "../../assets/ovchar.png";
 
@@ -11,10 +11,16 @@ interface HeroSectionProps {
 export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
   const [localTime, setLocalTime] = useState("");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [activeCoordinate, setActiveCoordinate] = useState({ x: "26.1432° N", y: "91.7378° E" });
 
   const overlayParallaxX = mousePos.x * 22;
   const overlayParallaxY = mousePos.y * 18;
+
+  const handleContactClick = () => {
+    const target = document.getElementById("contact");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   // Update Guwahati Local Time in real-time
   useEffect(() => {
@@ -45,16 +51,6 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
     const y = (clientY / height) - 0.5;
     
     setMousePos({ x, y });
-
-    // Procedurally update dynamic digital coordinate readouts based on mouse
-    const baseLat = 26.1432;
-    const baseLng = 91.7378;
-    const dynamicLat = (baseLat + y * 0.005).toFixed(4);
-    const dynamicLng = (baseLng + x * 0.005).toFixed(4);
-    setActiveCoordinate({
-      x: `${dynamicLat}° N`,
-      y: `${dynamicLng}° E`,
-    });
   };
 
   return (
@@ -124,29 +120,20 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
       {/* Main Core Content Container */}
       <div className="relative w-full flex-1 flex flex-col justify-center items-center z-10 max-w-6xl px-4 sm:px-6">
         
-        {/* A. PREMIUM COORDINATE FLOATING METADATA WIDGET (TOP) */}
+        {/* A. CONTACT FOR INFO PILL BUTTON */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center gap-6 mb-8 px-5 py-2.5 rounded-full border border-[#141414]/10 bg-white/65 backdrop-blur-md shadow-xs relative overflow-hidden"
+          className="mb-8"
         >
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="font-mono text-[10px] font-bold text-[#141414] tracking-widest uppercase">
-              Available for Freelance
-            </span>
-          </div>
-          
-          <div className="h-3 w-[1px] bg-[#141414]/15" />
-
-          <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-[#141414]/60 font-medium">
-            <Navigation className="w-3 h-3 text-[#141414]/50 animate-pulse" />
-            <span>{activeCoordinate.x}, {activeCoordinate.y}</span>
-          </div>
+          <button
+            type="button"
+            onClick={handleContactClick}
+            className="inline-flex items-center gap-2 rounded-full border border-[#141414]/10 bg-white/80 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.35em] text-[#141414] shadow-sm transition hover:bg-[#f5f2ed]"
+          >
+            Contact for Info
+          </button>
         </motion.div>
 
         {/* B. HERO TYPOGRAPHY FRAME */}
