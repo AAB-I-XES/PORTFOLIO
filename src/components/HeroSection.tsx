@@ -71,7 +71,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
     >
       {/* Full-bleed character overlay behind the content layer */}
       <div
-        className="absolute inset-0 pointer-events-none z-0"
+        className="absolute inset-0 pointer-events-none z-0 hidden md:block"
         style={{
           backgroundImage: `url(${ovcharBg})`,
           backgroundSize: "cover",
@@ -122,7 +122,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
       <div className="h-16 w-full relative z-10" />
 
       {/* Main Core Content Container */}
-      <div className="relative w-full flex-1 flex flex-col justify-center items-center z-10 max-w-6xl">
+      <div className="relative w-full flex-1 flex flex-col justify-center items-center z-10 max-w-6xl px-4 sm:px-6">
         
         {/* A. PREMIUM COORDINATE FLOATING METADATA WIDGET (TOP) */}
         <motion.div
@@ -156,7 +156,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           <div className="w-24 h-[1px] bg-[#141414]/10 mb-4" />
 
           {/* BACKGROUND TEXT */}
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-[100px] sm:text-[160px] md:text-[200px] font-black text-[#141414]/2 select-none tracking-tighter uppercase pointer-events-none font-display">
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-[54px] sm:text-[100px] md:text-[160px] font-black text-[#141414]/2 select-none tracking-tighter uppercase pointer-events-none font-display">
             CREATOR
           </div>
 
@@ -171,7 +171,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
 
           {/* The main typographic title */}
           <div className="relative flex flex-col items-center justify-center">
-            <h1 className="font-display font-normal text-6xl sm:text-8xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-[0.05em] uppercase select-none text-[#e7d8c7] drop-shadow-[0_2px_10px_rgba(20,20,20,0.45)]">
+            <h1 className="font-display font-normal text-5xl sm:text-7xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-[0.05em] uppercase select-none text-[#e7d8c7] drop-shadow-[0_2px_10px_rgba(20,20,20,0.45)]">
               <motion.span
                 initial={{ opacity: 0, y: 50, filter: "blur(12px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

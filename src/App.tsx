@@ -8,6 +8,7 @@ import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import { motion, AnimatePresence } from "motion/react";
+import bgImage from "../assets/bg-im.png";
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +49,15 @@ export default function App() {
   }, [isLoading, isMenuOpen]);
 
   return (
-    <div className="relative min-h-screen bg-[#111111] overflow-hidden select-none">
+    <div
+      className="relative min-h-screen overflow-hidden select-none"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+      }}
+    >
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="animated-gradient-background absolute inset-0" />
       </div>
@@ -81,7 +90,8 @@ export default function App() {
                 borderRadius: isMenuOpen ? "28px" : "0px",
               }}
               transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-              className="relative min-h-screen bg-[#f5f2ed] text-[#141414] overflow-x-hidden shadow-2xl pointer-events-auto origin-center"
+              className="relative min-h-screen text-[#141414] overflow-x-hidden shadow-2xl pointer-events-auto origin-center"
+              style={{ backgroundColor: "rgba(245,242,237,0.24)" }}
             >
               {/* If menu is open, render a clean interceptor overlay to safely snap back on click with soft shadow */}
               {isMenuOpen && (
