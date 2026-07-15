@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowDown, Compass, Navigation, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
-import heroBg from "../../assets/hero-bg.jpeg";
+import heroBg from "../../assets/hero-bg.png";
+import ovcharBg from "../../assets/ovchar.png";
 
 interface HeroSectionProps {
   onScrollToNext: () => void;
@@ -12,6 +13,9 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
   const [localTime, setLocalTime] = useState("");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [activeCoordinate, setActiveCoordinate] = useState({ x: "26.1432° N", y: "91.7378° E" });
+
+  const overlayParallaxX = mousePos.x * 22;
+  const overlayParallaxY = mousePos.y * 18;
 
   // Update Guwahati Local Time in real-time
   useEffect(() => {
@@ -59,13 +63,27 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
       id="hero"
       onMouseMove={handleMouseMove}
       style={{
-        backgroundImage: `linear-gradient(rgba(245, 242, 237, 0.68), rgba(245, 242, 237, 0.82)), url(${heroBg})`,
+        backgroundImage: `url(${heroBg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat"
       }}
       className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 overflow-hidden select-none"
     >
+      {/* Full-bleed character overlay behind the content layer */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `url(${ovcharBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundRepeat: "no-repeat",
+          transform: `translate3d(${overlayParallaxX}px, ${overlayParallaxY}px, 0) scale(1.06)`,
+          transition: "transform 200ms ease-out",
+          willChange: "transform"
+        }}
+      />
+
       {/* 1. ARCHITECTURAL DRAFTING PAPER BACKGROUND EFFECT */}
       <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.25]">
         {/* Drafting Grid */}
@@ -154,7 +172,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
 
           {/* The main typographic title */}
           <div className="relative flex flex-col items-center justify-center">
-            <h1 className="font-display font-normal text-6xl sm:text-8xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-[0.05em] uppercase select-none text-[#141414]">
+            <h1 className="font-display font-normal text-6xl sm:text-8xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-[0.05em] uppercase select-none text-[#e7d8c7] drop-shadow-[0_2px_10px_rgba(20,20,20,0.45)]">
               <motion.span
                 initial={{ opacity: 0, y: 50, filter: "blur(12px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
