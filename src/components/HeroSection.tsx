@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowDown, Compass, Navigation, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
+import heroBg from "../../assets/hero-bg.jpeg";
 
 interface HeroSectionProps {
   onScrollToNext: () => void;
@@ -57,7 +58,13 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
     <section
       id="hero"
       onMouseMove={handleMouseMove}
-      className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 bg-[#f5f2ed] overflow-hidden select-none"
+      style={{
+        backgroundImage: `linear-gradient(rgba(245, 242, 237, 0.68), rgba(245, 242, 237, 0.82)), url(${heroBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
+      className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 overflow-hidden select-none"
     >
       {/* 1. ARCHITECTURAL DRAFTING PAPER BACKGROUND EFFECT */}
       <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.25]">
@@ -132,7 +139,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           <div className="w-24 h-[1px] bg-[#141414]/10 mb-4" />
 
           {/* BACKGROUND TEXT */}
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-[100px] sm:text-[160px] md:text-[200px] font-black text-[#141414]/2 select-none tracking-tighter uppercase pointer-events-none font-sans">
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-[100px] sm:text-[160px] md:text-[200px] font-black text-[#141414]/2 select-none tracking-tighter uppercase pointer-events-none font-display">
             CREATOR
           </div>
 
@@ -147,7 +154,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
 
           {/* The main typographic title */}
           <div className="relative flex flex-col items-center justify-center">
-            <h1 className="font-display font-black text-6xl sm:text-8xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-tighter uppercase select-none text-[#141414]">
+            <h1 className="font-display font-normal text-6xl sm:text-8xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-[0.05em] uppercase select-none text-[#141414]">
               <motion.span
                 initial={{ opacity: 0, y: 50, filter: "blur(12px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -161,7 +168,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
                 initial={{ opacity: 0, y: 50, filter: "blur(12px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 1.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="block text-stroke-black text-transparent hover:text-[#141414] transition-all duration-700 cursor-pointer"
+                className="block"
               >
                 RABHA
               </motion.span>
