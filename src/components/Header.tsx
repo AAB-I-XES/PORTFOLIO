@@ -54,10 +54,39 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
   const [persistenceStatus, setPersistenceStatus] = useState<string>("Supabase diagnostics ready.");
 
   // Extras Sandbox states
-  const [particleCount, setParticleCount] = useState(70);
-  const [particleSpeed, setParticleSpeed] = useState(2.5);
-  const [drawingStyle, setDrawingStyle] = useState<"vellum" | "neon" | "ink">("vellum");
   const extrasCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [obstacles] = useState<Array<{ x: number; y: number }>>([
+    { x: 6, y: 3 },
+    { x: 6, y: 4 },
+    { x: 6, y: 5 },
+    { x: 6, y: 6 },
+    { x: 11, y: 8 },
+    { x: 12, y: 8 },
+    { x: 13, y: 8 },
+    { x: 8, y: 9 },
+    { x: 8, y: 10 },
+  ]);
+  const [snake, setSnake] = useState<Array<{ x: number; y: number }>>([
+    { x: 6, y: 6 },
+    { x: 5, y: 6 },
+    { x: 4, y: 6 },
+  ]);
+  const [food, setFood] = useState<{ x: number; y: number }>({ x: 10, y: 6 });
+  const [direction, setDirection] = useState<{ x: number; y: number }>({ x: 1, y: 0 });
+  const [score, setScore] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
+  const [isGameRunning, setIsGameRunning] = useState(true);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const directionRef = useRef({ x: 1, y: 0 });
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const applyDirection = (nextDirection: { x: number; y: number }) => {
+    const isOpposite = nextDirection.x === -directionRef.current.x && nextDirection.y === -directionRef.current.y;
+    if (isOpposite) return;
+
+    directionRef.current = nextDirection;
+    setDirection(nextDirection);
+  };
 
   const menuItems = [
     { id: "hero", label: "01", title: "Home", subtitle: "Overview", spec: "Home" },
@@ -66,6 +95,27 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
     { id: "projects", label: "04", title: "Projects", subtitle: "Work", spec: "Projects" },
     { id: "contact", label: "05", title: "Contact", subtitle: "Reach out", spec: "Contact" }
   ];
+
+  const makeFood = (currentSnake: Array<{ x: number; y: number }>, blockedCells: Array<{ x: number; y: number }> = obstacles) => {
+    const occupied = new Set(currentSnake.map((segment) => `${segment.x},${segment.y}`));
+    blockedCells.forEach((cell) => occupied.add(`${cell.x},${cell.y}`));
+
+    let candidate = { x: 0, y: 0 };
+    let placed = false;
+
+    while (!placed) {
+      candidate = {
+        x: Math.floor(Math.random() * 18),
+        y: Math.floor(Math.random() * 12),
+      };
+
+      if (!occupied.has(`${candidate.x},${candidate.y}`)) {
+        placed = true;
+      }
+    }
+
+    return candidate;
+  };
 
   const navPills = [
     { id: "home", label: "Home" },
@@ -398,9 +448,10 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animId: number;
-    let width = canvas.width = canvas.parentElement?.clientWidth || 400;
-    let height = canvas.height = canvas.parentElement?.clientHeight || 250;
+    let width = canvas.width = canvas.parentElement?.clientWidth || 420;
+    let height = canvas.height = canvas.parentElement?.clientHeight || 260;
+    const cellWidth = width / 18;
+    const cellHeight = height / 12;
 
     const handleResize = () => {
       if (canvas && canvas.parentElement) {
@@ -410,113 +461,146 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
     };
     window.addEventListener("resize", handleResize);
 
-    const particles = Array.from({ length: particleCount }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * particleSpeed,
-      vy: (Math.random() - 0.5) * particleSpeed,
-      size: Math.random() * 3 + 1,
-      color: `hsl(${Math.random() * 360}, 75%, 60%)`
-    }));
+    const drawGame = () => {
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#fbf9f4";
+      ctx.fillRect(0, 0, width, height);
 
-    let mouseX = width / 2;
-    let mouseY = height / 2;
-
-    const handleCanvasMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
-    };
-    canvas.addEventListener("mousemove", handleCanvasMouseMove);
-
-    const run = () => {
-      if (drawingStyle === "vellum") {
-        ctx.fillStyle = "#fbf9f4";
-        ctx.fillRect(0, 0, width, height);
-        // Draw grid
-        ctx.strokeStyle = "rgba(20, 20, 20, 0.04)";
-        ctx.lineWidth = 0.5;
-        for (let x = 0; x < width; x += 20) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, height);
-          ctx.stroke();
-        }
-        for (let y = 0; y < height; y += 20) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(width, y);
-          ctx.stroke();
-        }
-      } else if (drawingStyle === "neon") {
-        ctx.fillStyle = "rgba(20, 20, 20, 0.12)";
-        ctx.fillRect(0, 0, width, height);
-      } else {
-        ctx.fillStyle = "rgba(245, 242, 237, 0.15)";
-        ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = "rgba(20, 20, 20, 0.08)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= 18; x += 1) {
+        ctx.beginPath();
+        ctx.moveTo(x * cellWidth, 0);
+        ctx.lineTo(x * cellWidth, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= 12; y += 1) {
+        ctx.beginPath();
+        ctx.moveTo(0, y * cellHeight);
+        ctx.lineTo(width, y * cellHeight);
+        ctx.stroke();
       }
 
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        const dx = mouseX - p.x;
-        const dy = mouseY - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          p.vx += (dx / dist) * 0.12;
-          p.vy += (dy / dist) * 0.12;
-        }
-
-        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        const maxSpeed = particleSpeed * 1.5;
-        if (speed > maxSpeed) {
-          p.vx = (p.vx / speed) * maxSpeed;
-          p.vy = (p.vy / speed) * maxSpeed;
-        }
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        if (drawingStyle === "vellum") {
-          ctx.fillStyle = "#e05050";
-        } else if (drawingStyle === "neon") {
-          ctx.fillStyle = p.color;
-        } else {
-          ctx.fillStyle = "#141414";
-        }
-        ctx.fill();
+      obstacles.forEach((cell) => {
+        ctx.fillStyle = "#141414";
+        ctx.fillRect(cell.x * cellWidth + 2, cell.y * cellHeight + 2, cellWidth - 4, cellHeight - 4);
       });
 
-      if (drawingStyle === "vellum") {
-        ctx.strokeStyle = "rgba(224, 80, 80, 0.18)";
-        ctx.lineWidth = 0.5;
-        particles.forEach((p) => {
-          const dx = mouseX - p.x;
-          const dy = mouseY - p.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 80) {
-            ctx.beginPath();
-            ctx.moveTo(mouseX, mouseY);
-            ctx.lineTo(p.x, p.y);
-            ctx.stroke();
+      snake.forEach((segment, index) => {
+        ctx.fillStyle = index === 0 ? "#e05050" : "#141414";
+        ctx.fillRect(segment.x * cellWidth + 3, segment.y * cellHeight + 3, cellWidth - 6, cellHeight - 6);
+      });
+
+      ctx.fillStyle = "#ffd6e0";
+      ctx.fillRect(food.x * cellWidth + 4, food.y * cellHeight + 4, cellWidth - 8, cellHeight - 8);
+
+      ctx.fillStyle = "rgba(20, 20, 20, 0.75)";
+      ctx.font = "600 12px 'JetBrains Mono', monospace";
+      ctx.fillText(`SCORE ${score}`, 12, 18);
+      ctx.fillText(`BEST ${bestScore}`, width - 88, 18);
+
+      if (isGameOver) {
+        ctx.fillStyle = "rgba(20, 20, 20, 0.8)";
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "#fbf9f4";
+        ctx.font = "700 22px 'JetBrains Mono', monospace";
+        ctx.fillText("GAME OVER", width / 2 - 62, height / 2 - 10);
+        ctx.font = "600 11px 'JetBrains Mono', monospace";
+        ctx.fillText("Press restart to play again", width / 2 - 86, height / 2 + 20);
+      }
+    };
+
+    drawGame();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [activeModal, snake, food, score, bestScore, isGameOver]);
+
+  useEffect(() => {
+    if (activeModal !== "extras") return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      const nextDirections: Record<string, { x: number; y: number }> = {
+        arrowup: { x: 0, y: -1 },
+        w: { x: 0, y: -1 },
+        arrowdown: { x: 0, y: 1 },
+        s: { x: 0, y: 1 },
+        arrowleft: { x: -1, y: 0 },
+        a: { x: -1, y: 0 },
+        arrowright: { x: 1, y: 0 },
+        d: { x: 1, y: 0 },
+      };
+
+      const nextDirection = nextDirections[key];
+      if (!nextDirection) return;
+
+      event.preventDefault();
+      applyDirection(nextDirection);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeModal, direction]);
+
+  useEffect(() => {
+    if (activeModal !== "extras" || !isGameRunning || isGameOver) return;
+
+    let rafId = 0;
+    let lastTime = 0;
+    const tickInterval = 110;
+
+    const loop = (timestamp: number) => {
+      if (!lastTime) lastTime = timestamp;
+      const elapsed = timestamp - lastTime;
+
+      if (elapsed >= tickInterval) {
+        lastTime = timestamp;
+        setSnake((currentSnake) => {
+          const head = currentSnake[0];
+          const nextHead = {
+            x: head.x + directionRef.current.x,
+            y: head.y + directionRef.current.y,
+          };
+
+          const hitsWall = nextHead.x < 0 || nextHead.x >= 18 || nextHead.y < 0 || nextHead.y >= 12;
+          const hitsObstacle = obstacles.some((cell) => cell.x === nextHead.x && cell.y === nextHead.y);
+          const hitsSelf = currentSnake.some((segment) => segment.x === nextHead.x && segment.y === nextHead.y);
+
+          if (hitsWall || hitsObstacle || hitsSelf) {
+            setIsGameRunning(false);
+            setIsGameOver(true);
+            setBestScore((highest) => Math.max(highest, score));
+            return currentSnake;
           }
+
+          const ateFood = nextHead.x === food.x && nextHead.y === food.y;
+          const nextSnake = [nextHead, ...currentSnake];
+          if (!ateFood) {
+            nextSnake.pop();
+          } else {
+            setScore((currentScore) => {
+              const updatedScore = currentScore + 1;
+              setBestScore((highest) => Math.max(highest, updatedScore));
+              return updatedScore;
+            });
+            setFood(makeFood(nextSnake, obstacles));
+          }
+
+          return nextSnake;
         });
       }
 
-      animId = requestAnimationFrame(run);
+      rafId = window.requestAnimationFrame(loop);
     };
 
-    run();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", handleResize);
-      canvas.removeEventListener("mousemove", handleCanvasMouseMove);
-    };
-  }, [activeModal, particleCount, particleSpeed, drawingStyle]);
+    rafId = window.requestAnimationFrame(loop);
+    return () => window.cancelAnimationFrame(rafId);
+  }, [activeModal, isGameRunning, isGameOver, food, score, obstacles]);
 
   const handleItemMouseEnter = (e: React.MouseEvent, index: number) => {
     setHoveredIdx(index);
@@ -825,64 +909,141 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
                         <div className="space-y-6">
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#141414]/5 p-4 rounded-2xl border border-[#141414]/10">
                             <div>
-                              <h5 className="font-display font-black text-lg text-[#141414]">VECTOR PLAYGROUND</h5>
+                              <h5 className="font-display font-black text-lg text-[#141414]">SNAKE ARCADE</h5>
                               <p className="font-mono text-[10px] text-[#141414]/60 uppercase tracking-widest mt-1">
-                                Drag or move cursor to attract drafting nodes
+                                Use arrow keys or the touch pad to collect the pink tokens
                               </p>
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                              {(["vellum", "neon", "ink"] as const).map((style) => (
-                                <button
-                                  key={style}
-                                  onClick={() => setDrawingStyle(style)}
-                                  className={`cursor-pointer px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase border transition-all ${
-                                    drawingStyle === style
-                                      ? "bg-[#141414] text-[#fbf9f4] border-[#141414]"
-                                      : "bg-transparent text-[#141414]/60 border-[#141414]/15 hover:border-[#141414] hover:text-[#141414]"
-                                  }`}
-                                >
-                                  {style}
-                                </button>
-                              ))}
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIsGameRunning(true);
+                                  setIsGameOver(false);
+                                }}
+                                className="cursor-pointer px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase border border-[#141414] bg-[#141414] text-[#fbf9f4]"
+                              >
+                                Resume
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIsGameRunning(false);
+                                }}
+                                className="cursor-pointer px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase border border-[#141414]/20 bg-white text-[#141414]"
+                              >
+                                Pause
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSnake([
+                                    { x: 6, y: 6 },
+                                    { x: 5, y: 6 },
+                                    { x: 4, y: 6 },
+                                  ]);
+                                  setDirection({ x: 1, y: 0 });
+                                  directionRef.current = { x: 1, y: 0 };
+                                  setFood({ x: 10, y: 6 });
+                                  setScore(0);
+                                  setIsGameRunning(true);
+                                  setIsGameOver(false);
+                                }}
+                                className="cursor-pointer px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase border border-[#141414]/20 bg-white text-[#141414]"
+                              >
+                                Restart
+                              </button>
                             </div>
                           </div>
 
-                          {/* Live Canvas Area */}
-                          <div className="relative w-full h-56 rounded-2xl border-2 border-[#141414] bg-[#fbf9f4] overflow-hidden shadow-[4px_4px_0px_rgba(20,20,20,0.08)]">
+                          <div
+                            className="relative w-full h-72 rounded-2xl border-2 border-[#141414] bg-[#fbf9f4] overflow-hidden shadow-[4px_4px_0px_rgba(20,20,20,0.08)]"
+                            onTouchStart={(event) => {
+                              const touch = event.touches[0];
+                              touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+                            }}
+                            onTouchEnd={(event) => {
+                              const touch = event.changedTouches[0];
+                              const start = touchStartRef.current;
+                              if (!start) return;
+
+                              const deltaX = touch.clientX - start.x;
+                              const deltaY = touch.clientY - start.y;
+                              const threshold = 18;
+
+                              if (Math.abs(deltaX) < threshold && Math.abs(deltaY) < threshold) return;
+
+                              if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                                applyDirection(deltaX > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
+                              } else {
+                                applyDirection(deltaY > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
+                              }
+
+                              touchStartRef.current = null;
+                            }}
+                          >
                             <canvas ref={extrasCanvasRef} className="w-full h-full block" />
                           </div>
 
-                          {/* Control sliders */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#141414]/5 p-4 rounded-2xl border border-[#141414]/10">
-                            <div className="space-y-2">
-                              <div className="flex justify-between font-mono text-[10px] text-[#141414]/60 font-black">
-                                <span>PARTICLE COUNT</span>
-                                <span>{particleCount} NODES</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="20"
-                                max="150"
-                                value={particleCount}
-                                onChange={(e) => setParticleCount(Number(e.target.value))}
-                                className="w-full accent-[#e05050] bg-[#141414]/10 h-1.5 rounded-lg appearance-none cursor-pointer"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <div className="flex justify-between font-mono text-[10px] text-[#141414]/60 font-black">
-                                <span>PHYSICS SPEED</span>
-                                <span>{particleSpeed.toFixed(1)}x</span>
-                              </div>
-                              <input
-                                type="range"
-                                min="0.5"
-                                max="6.0"
-                                step="0.5"
-                                value={particleSpeed}
-                                onChange={(e) => setParticleSpeed(Number(e.target.value))}
-                                className="w-full accent-[#e05050] bg-[#141414]/10 h-1.5 rounded-lg appearance-none cursor-pointer"
-                              />
-                            </div>
+                          <div className="grid grid-cols-3 gap-2 max-w-[220px] mx-auto">
+                            <div />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextDirection = { x: 0, y: -1 };
+                                const isOpposite = nextDirection.x === -directionRef.current.x && nextDirection.y === -directionRef.current.y;
+                                if (!isOpposite) {
+                                  directionRef.current = nextDirection;
+                                  setDirection(nextDirection);
+                                }
+                              }}
+                              className="cursor-pointer px-4 py-2 rounded-xl border border-[#141414]/15 bg-white text-[#141414] font-mono text-[9px] font-bold uppercase"
+                            >
+                              Up
+                            </button>
+                            <div />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextDirection = { x: -1, y: 0 };
+                                const isOpposite = nextDirection.x === -directionRef.current.x && nextDirection.y === -directionRef.current.y;
+                                if (!isOpposite) {
+                                  directionRef.current = nextDirection;
+                                  setDirection(nextDirection);
+                                }
+                              }}
+                              className="cursor-pointer px-4 py-2 rounded-xl border border-[#141414]/15 bg-white text-[#141414] font-mono text-[9px] font-bold uppercase"
+                            >
+                              Left
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextDirection = { x: 0, y: 1 };
+                                const isOpposite = nextDirection.x === -directionRef.current.x && nextDirection.y === -directionRef.current.y;
+                                if (!isOpposite) {
+                                  directionRef.current = nextDirection;
+                                  setDirection(nextDirection);
+                                }
+                              }}
+                              className="cursor-pointer px-4 py-2 rounded-xl border border-[#141414]/15 bg-white text-[#141414] font-mono text-[9px] font-bold uppercase"
+                            >
+                              Down
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextDirection = { x: 1, y: 0 };
+                                const isOpposite = nextDirection.x === -directionRef.current.x && nextDirection.y === -directionRef.current.y;
+                                if (!isOpposite) {
+                                  directionRef.current = nextDirection;
+                                  setDirection(nextDirection);
+                                }
+                              }}
+                              className="cursor-pointer px-4 py-2 rounded-xl border border-[#141414]/15 bg-white text-[#141414] font-mono text-[9px] font-bold uppercase"
+                            >
+                              Right
+                            </button>
                           </div>
                         </div>
                       )}
