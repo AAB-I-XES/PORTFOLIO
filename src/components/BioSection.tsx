@@ -1,11 +1,41 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useSpring } from "motion/react";
 import { PenTool } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
-import studioPhoto from "../../assets/ovchar.png";
+
+const GITHUB_PROFILE_PHOTO = "https://github.com/AAB-I-XES.png";
+const LINKEDIN_PROFILE_PHOTO = "https://github.com/AAB-I-XES.png";
+
+const PROFILE_CARDS = [
+  {
+    id: "github",
+    title: "GitHub",
+    subtitle: "Code Archive",
+    image: GITHUB_PROFILE_PHOTO,
+  },
+  {
+    id: "linkedin",
+    title: "LinkedIn",
+    subtitle: "Professional Pulse",
+    image: LINKEDIN_PROFILE_PHOTO,
+  },
+  {
+    id: "portfolio",
+    title: "Featured",
+    subtitle: "Creative Identity",
+    image: null,
+  },
+  {
+    id: "studio",
+    title: "Archive",
+    subtitle: "Coming Soon",
+    image: null,
+  },
+];
 
 export default function BioSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [activeCardIdx, setActiveCardIdx] = useState(1);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -89,28 +119,68 @@ export default function BioSection() {
         </motion.div>
 
         <div className="lg:col-span-5 flex flex-col gap-4">
-          <div className="bg-[#f5f2ed] rounded-2xl border-2 border-[#141414] p-4 shadow-[4px_4px_0px_#141414] relative overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between border-b border-[#141414]/10 pb-3 mb-3">
+          <div className="relative flex flex-col">
+            <div className="flex items-center justify-between pb-3 mb-3">
               <div className="font-mono text-xs uppercase font-bold text-[#141414]">
                 Profile Snapshot
               </div>
-              <div className="font-mono text-[9px] uppercase tracking-wider text-[#141414]/50">
-                Studio Frame
-              </div>
+              <button
+                type="button"
+                onClick={() => setActiveCardIdx((prev) => (prev + 1) % PROFILE_CARDS.length)}
+                className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#141414] border border-[#141414]/15 bg-white/70 px-3 py-1.5 rounded-full transition hover:bg-[#ffd6e0]"
+              >
+                Switch
+              </button>
             </div>
 
-            <div className="relative w-full h-72 md:h-80 rounded-xl overflow-hidden border-2 border-dashed border-[#141414]/15 bg-white/65">
-              <img
-                src={studioPhoto}
-                alt="Profile portrait"
-                className="w-full h-full object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10" />
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-full border border-white/45 bg-[#141414]/50 px-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.28em] text-white/90 backdrop-blur-sm">
-                <span>Student</span>
-                <span>Builder</span>
-                <span>Visual Thinker</span>
-              </div>
+            <div className="relative h-[26rem] md:h-[32rem] w-full overflow-visible">
+              {PROFILE_CARDS.map((card, idx) => {
+                const offset = idx - activeCardIdx;
+                const distance = Math.abs(offset);
+                const isActive = idx === activeCardIdx;
+
+                return (
+                  <motion.button
+                    key={card.id}
+                    type="button"
+                    onClick={() => setActiveCardIdx(idx)}
+                    animate={{
+                      x: offset * 110,
+                      scale: isActive ? 1.12 : Math.max(0.72, 1 - distance * 0.12),
+                      y: isActive ? 0 : distance * 22,
+                      opacity: isActive ? 1 : 0.72 - distance * 0.12,
+                      filter: isActive ? "blur(0px)" : "blur(0.4px)",
+                    }}
+                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
+                    className="absolute top-1/2 left-1/2 h-[20rem] md:h-[24rem] w-[14rem] md:w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] bg-[#f5f2ed] shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
+                    style={{ zIndex: 20 - distance }}
+                  >
+                    {card.image ? (
+                      <>
+                        <div className="h-full w-full border-[10px] border-[#f5f2ed] bg-[#f5f2ed]">
+                          <img
+                            src={card.image}
+                            alt={card.title}
+                            className="h-full w-full object-cover object-center"
+                          />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-white/10" />
+                      </>
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,_#fff6f8,_#f5f2ed_50%,_#e6dfd3)] p-6 text-center">
+                        <div className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#141414]/55">
+                          {card.subtitle}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-full bg-[#141414]/55 px-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.28em] text-white/90 backdrop-blur-sm">
+                      <span>{card.title}</span>
+                      <span>{isActive ? "Active" : "Preview"}</span>
+                    </div>
+                  </motion.button>
+                );
+              })}
             </div>
           </div>
 
@@ -120,6 +190,7 @@ export default function BioSection() {
           </div>
         </div>
       </div>
+
     </section>
   );
 }
