@@ -3,9 +3,23 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
 
+export const supabaseConfig = {
+  hasUrl: Boolean(supabaseUrl),
+  hasAnonKey: Boolean(supabaseAnonKey),
+};
+
 export const supabaseClient = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
+
+export const supabaseDiagnostics = {
+  isReady: Boolean(supabaseClient),
+  envStatus: `url=${supabaseConfig.hasUrl ? "present" : "missing"}; anon=${supabaseConfig.hasAnonKey ? "present" : "missing"}`,
+};
+
+if (!supabaseClient) {
+  console.warn("Supabase client is not configured. Expected VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in the environment.");
+}
 
 export type ForumPostRecord = {
   id: string;
@@ -31,7 +45,12 @@ export async function loadForumPostsFromSupabase() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.warn("Supabase forum load failed:", error.message);
+    console.warn("Supabase forum load failed:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
     return null;
   }
 
@@ -54,7 +73,12 @@ export async function saveForumPostToSupabase(post: {
     .single();
 
   if (error) {
-    console.warn("Supabase forum save failed:", error.message);
+    console.warn("Supabase forum save failed:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
     return null;
   }
 
@@ -70,7 +94,12 @@ export async function loadReportsFromSupabase() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.warn("Supabase report load failed:", error.message);
+    console.warn("Supabase report load failed:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
     return null;
   }
 
@@ -95,7 +124,12 @@ export async function saveReportToSupabase(report: {
     .single();
 
   if (error) {
-    console.warn("Supabase report save failed:", error.message);
+    console.warn("Supabase report save failed:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
     return null;
   }
 

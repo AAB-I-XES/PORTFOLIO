@@ -23,6 +23,7 @@ import {
   saveForumPostToSupabase,
   loadReportsFromSupabase,
   saveReportToSupabase,
+  supabaseDiagnostics,
 } from "../lib/supabase";
 
 interface HeaderProps {
@@ -50,6 +51,7 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
   const [reportProgress, setReportProgress] = useState(0);
   const [submittedTicket, setSubmittedTicket] = useState<string | null>(null);
   const [ticketsList, setTicketsList] = useState<Array<{ id: string; category: string; severity: string; desc: string }>>([]);
+  const [persistenceStatus, setPersistenceStatus] = useState<string>("Supabase diagnostics ready.");
 
   // Extras Sandbox states
   const [particleCount, setParticleCount] = useState(70);
@@ -76,6 +78,12 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
   // Sync forum and ticket lists from Supabase if available, otherwise use localStorage
   useEffect(() => {
     if (!isMenuOpen) return;
+
+    setPersistenceStatus(
+      supabaseDiagnostics.isReady
+        ? `Supabase live: ${supabaseDiagnostics.envStatus}`
+        : `Supabase offline: ${supabaseDiagnostics.envStatus}. Falling back to localStorage.`
+    );
 
     const hydrateData = async () => {
       const remotePosts = await loadForumPostsFromSupabase();
@@ -162,6 +170,12 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
       message: newPostText.trim(),
     });
 
+    if (remotePost) {
+      setPersistenceStatus("Forum post saved to Supabase successfully.");
+    } else {
+      setPersistenceStatus("Forum post save failed in Supabase; data was kept locally only.");
+    }
+
     const hydratedPost = remotePost
       ? {
           name: remotePost.author_name,
@@ -210,6 +224,7 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
             description: reportDesc,
           }).then((remoteTicket) => {
             if (remoteTicket) {
+              setPersistenceStatus("Report submitted to Supabase successfully.");
               const hydratedTicket = {
                 id: remoteTicket.id,
                 category: remoteTicket.category,
@@ -221,6 +236,7 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
               setTicketsList(updatedTickets);
               localStorage.setItem("portfolio_tickets", JSON.stringify(updatedTickets));
             } else {
+              setPersistenceStatus("Report save failed in Supabase; data was kept locally only.");
               const updatedTickets = [newTicket, ...ticketsList];
               setTicketsList(updatedTickets);
               localStorage.setItem("portfolio_tickets", JSON.stringify(updatedTickets));
@@ -922,6 +938,9 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
 
                       {activeModal === "forum" && (
                         <div className="space-y-6">
+                          <div className="rounded-xl border border-[#141414]/10 bg-white px-3 py-2 font-mono text-[9px] uppercase tracking-wider text-[#141414]/60">
+                            {persistenceStatus}
+                          </div>
                           {/* Write a message */}
                           <form onSubmit={handleAddPost} className="bg-[#141414]/5 p-4 rounded-2xl border border-[#141414]/10 space-y-3.5">
                             <span className="font-mono text-[9px] text-[#e05050] font-black uppercase tracking-widest">[ COMMUNITY FEEDBACK WALL ]</span>
@@ -976,6 +995,9 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
 
                       {activeModal === "report" && (
                         <div className="space-y-6">
+                          <div className="rounded-xl border border-[#141414]/10 bg-white px-3 py-2 font-mono text-[9px] uppercase tracking-wider text-[#141414]/60">
+                            {persistenceStatus}
+                          </div>
                           {!submittedTicket ? (
                             <form onSubmit={handleTicketSubmit} className="space-y-5">
                               <div className="bg-[#141414]/5 p-4 rounded-2xl border border-[#141414]/10 space-y-4">
