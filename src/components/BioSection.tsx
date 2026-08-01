@@ -3,10 +3,11 @@ import { motion, useScroll, useTransform, useSpring } from "motion/react";
 import { PenTool } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
 import ovcharBg from "../../assets/ovchar.png";
+import pic3 from "../../assets/pic3.jpg";
 
 const HERO_CHARACTER_PHOTO = ovcharBg;
 const GITHUB_PROFILE_PHOTO = "https://github.com/AAB-I-XES.png";
-const LINKEDIN_PROFILE_PHOTO = "https://github.com/AAB-I-XES.png";
+const LINKEDIN_PROFILE_PHOTO = pic3;
 
 const PROFILE_CARDS = [
   {
@@ -30,25 +31,48 @@ const PROFILE_CARDS = [
   {
     id: "portfolio",
     title: "Featured",
-    subtitle: "Creative Identity",
+    subtitle: "Nothing to view",
     image: null,
   },
   {
     id: "studio",
     title: "Archive",
-    subtitle: "Coming Soon",
+    subtitle: "Nothing to view",
     image: null,
   },
 ];
 
 export default function BioSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
   const [activeCardIdx, setActiveCardIdx] = useState(2);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
+
+  const goToCard = (index: number) => setActiveCardIdx(index);
+  const moveCard = (direction: 1 | -1) => {
+    setActiveCardIdx((prev) => (prev + direction + PROFILE_CARDS.length) % PROFILE_CARDS.length);
+  };
+
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartX.current === null) return;
+
+    const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX.current;
+    const deltaX = touchEndX - touchStartX.current;
+
+    if (Math.abs(deltaX) > 50) {
+      moveCard(deltaX < 0 ? 1 : -1);
+    }
+
+    touchStartX.current = null;
+  };
 
   const bioY = useTransform(scrollYProgress, [0, 0.5, 1], [40, 0, -40]);
   const smoothBioY = useSpring(bioY, { stiffness: 100, damping: 20 });
@@ -134,14 +158,18 @@ export default function BioSection() {
               </div>
               <button
                 type="button"
-                onClick={() => setActiveCardIdx((prev) => (prev + 1) % PROFILE_CARDS.length)}
+                onClick={() => moveCard(1)}
                 className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#141414] border border-[#141414]/15 bg-white/70 px-3 py-1.5 rounded-full transition hover:bg-[#ffd6e0]"
               >
                 Switch
               </button>
             </div>
 
-            <div className="relative h-[26rem] md:h-[32rem] w-full overflow-visible">
+            <div
+              className="relative h-[20rem] sm:h-[26rem] md:h-[32rem] w-full overflow-visible touch-pan-y"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
               {PROFILE_CARDS.map((card, idx) => {
                 const offset = idx - activeCardIdx;
                 const distance = Math.abs(offset);
@@ -151,16 +179,16 @@ export default function BioSection() {
                   <motion.button
                     key={card.id}
                     type="button"
-                    onClick={() => setActiveCardIdx(idx)}
+                    onClick={() => goToCard(idx)}
                     animate={{
-                      x: offset * 110,
-                      scale: isActive ? 1.12 : Math.max(0.72, 1 - distance * 0.12),
-                      y: isActive ? 0 : distance * 22,
+                      x: offset * 84,
+                      scale: isActive ? 1.08 : Math.max(0.68, 1 - distance * 0.12),
+                      y: isActive ? 0 : distance * 16,
                       opacity: isActive ? 1 : 0.72 - distance * 0.12,
                       filter: isActive ? "blur(0px)" : "blur(0.4px)",
                     }}
                     transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                    className="absolute top-1/2 left-1/2 h-[20rem] md:h-[24rem] w-[14rem] md:w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] bg-[#f5f2ed] shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
+                    className="absolute top-1/2 left-1/2 h-[15rem] sm:h-[20rem] md:h-[24rem] w-[10.5rem] sm:w-[14rem] md:w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] bg-[#f5f2ed] shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
                     style={{ zIndex: 20 - distance }}
                   >
                     {card.image ? (

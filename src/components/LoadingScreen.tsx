@@ -79,7 +79,6 @@ export default function LoadingScreen({ onComplete, onExitStart }: LoadingScreen
                 <span className="w-2 h-2 rounded-full bg-[#141414] animate-ping" />
                 <span>DIBYAJYOTI RABHA</span>
               </div>
-              <span>PORTFOLIO PRELOAD // 2026</span>
             </div>
 
             {/* Central Sketch Animation */}
@@ -163,8 +162,6 @@ export default function LoadingScreen({ onComplete, onExitStart }: LoadingScreen
             {/* Bottom Info Bar */}
             <div className="flex flex-col sm:flex-row justify-between items-center font-mono text-[10px] tracking-wider text-[#141414]/40 border-t border-[#141414]/10 pt-4 gap-2 text-center">
               <span>D.RABHA &copy; 2026 &mdash; ALL RIGHTS OBSERVED</span>
-              <span className="hidden sm:inline">|</span>
-              <span>BEIGE / SOFT PINK / CHARCOAL SYSTEM</span>
             </div>
           </motion.div>
         </motion.div>
