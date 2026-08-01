@@ -125,7 +125,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8"
+          className="mb-4 flex flex-col items-center gap-3"
         >
           <button
             type="button"
@@ -134,6 +134,10 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           >
             Contact for Info
           </button>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#141414]/10 bg-[#f5f2ed]/85 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#141414]/70 shadow-sm">
+            <Sparkles className="w-3.5 h-3.5" />
+            {BIO_SUMMARY.availability}
+          </div>
         </motion.div>
 
         {/* B. HERO TYPOGRAPHY FRAME */}

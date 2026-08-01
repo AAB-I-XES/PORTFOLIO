@@ -3,9 +3,10 @@ import { Project, SkillCategory, JourneyMilestone } from "./types";
 export const BIO_SUMMARY = {
   name: "DIBYAJYOTI RABHA",
   title: "Creative Developer & Illustrator",
-  tagline: "Merging procedural logic with hand-drawn art to build tactile, soulful digital experiences.",
-  intro: "I am a software developer with a deep, consuming passion for creative design, vector graphics, and digital illustration. My practice sits at the fragile intersection of engineering and art. I don't just write functional code; I compose interactive canvases and design expressive, responsive layouts that feel alive.",
-  detailedBio: "Growing up fascinated by both comic-book sketchbooks and the magic of programming, I realized that modern browsers are the ultimate canvas. I specialize in building ultra-responsive web applications, native mobile frameworks, and interactive vector tools. From robust React structures to performance-oriented C++ engines, every line is crafted with structural intent and meticulous attention to layout, typography, and motion choreography."
+  tagline: "Merging code, motion, and hand-drawn illustration into tactile digital experiences.",
+  availability: "Available for select freelance and collaboration opportunities.",
+  intro: "I’m an Electronics and Communication Engineering student at Assam Skill University, Mangaldai, Assam, with a growing focus on building meaningful digital products. My work spans web development, Android development, and creative interface design, with a strong interest in responsive experiences, polished UI systems, and user-centered product thinking.",
+  detailedBio: "I enjoy turning ideas into practical, visually expressive applications across web and mobile platforms. While I work confidently with modern frontend workflows, I am also actively developing Android experiences using Kotlin and React Native, with an emphasis on clean architecture, intuitive UX, and polished interaction design. My practice brings together engineering discipline, creative illustration, and a product mindset rooted in both function and detail."
 };
 
 export const PROJECTS_DATA: Project[] = [
