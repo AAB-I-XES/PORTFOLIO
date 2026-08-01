@@ -18,6 +18,12 @@ import {
   ChevronUp,
   Inbox
 } from "lucide-react";
+import {
+  loadForumPostsFromSupabase,
+  saveForumPostToSupabase,
+  loadReportsFromSupabase,
+  saveReportToSupabase,
+} from "../lib/supabase";
 
 interface HeaderProps {
   onNavClick: (targetId: string) => void;
@@ -67,27 +73,59 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
     { id: "report", label: "Report" }
   ];
 
-  // Sync forum and ticket lists from localStorage
+  // Sync forum and ticket lists from Supabase if available, otherwise use localStorage
   useEffect(() => {
     if (!isMenuOpen) return;
-    
-    const storedPosts = localStorage.getItem("portfolio_forum_posts");
-    if (storedPosts) {
-      setForumPosts(JSON.parse(storedPosts));
-    } else {
-      const defaultPosts = [
-        { name: "Siddharth", text: "The elastic spring canvas in the menu is absolutely insane!", time: "2 hours ago" },
-        { name: "Elena_K", text: "Guwahati has some awesome hidden talent. This design aesthetic is 10/10.", time: "1 day ago" },
-        { name: "Pranav_Dev", text: "Love how lightweight the micro-interactions feel. Crisp and fluid.", time: "3 days ago" }
-      ];
-      setForumPosts(defaultPosts);
-      localStorage.setItem("portfolio_forum_posts", JSON.stringify(defaultPosts));
-    }
 
-    const storedTickets = localStorage.getItem("portfolio_tickets");
-    if (storedTickets) {
-      setTicketsList(JSON.parse(storedTickets));
-    }
+    const hydrateData = async () => {
+      const remotePosts = await loadForumPostsFromSupabase();
+      if (remotePosts && remotePosts.length > 0) {
+        const mappedPosts = remotePosts.map((post) => ({
+          name: post.author_name,
+          text: post.message,
+          time: new Date(post.created_at).toLocaleString("en", {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          }),
+        }));
+        setForumPosts(mappedPosts);
+        localStorage.setItem("portfolio_forum_posts", JSON.stringify(mappedPosts));
+      } else {
+        const storedPosts = localStorage.getItem("portfolio_forum_posts");
+        if (storedPosts) {
+          setForumPosts(JSON.parse(storedPosts));
+        } else {
+          const defaultPosts = [
+            { name: "Siddharth", text: "The elastic spring canvas in the menu is absolutely insane!", time: "2 hours ago" },
+            { name: "Elena_K", text: "Guwahati has some awesome hidden talent. This design aesthetic is 10/10.", time: "1 day ago" },
+            { name: "Pranav_Dev", text: "Love how lightweight the micro-interactions feel. Crisp and fluid.", time: "3 days ago" }
+          ];
+          setForumPosts(defaultPosts);
+          localStorage.setItem("portfolio_forum_posts", JSON.stringify(defaultPosts));
+        }
+      }
+
+      const remoteTickets = await loadReportsFromSupabase();
+      if (remoteTickets && remoteTickets.length > 0) {
+        const mappedTickets = remoteTickets.map((ticket) => ({
+          id: ticket.id,
+          category: ticket.category,
+          severity: ticket.severity,
+          desc: ticket.description,
+        }));
+        setTicketsList(mappedTickets);
+        localStorage.setItem("portfolio_tickets", JSON.stringify(mappedTickets));
+      } else {
+        const storedTickets = localStorage.getItem("portfolio_tickets");
+        if (storedTickets) {
+          setTicketsList(JSON.parse(storedTickets));
+        }
+      }
+    };
+
+    hydrateData();
   }, [isMenuOpen]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -109,29 +147,48 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
     }, 600);
   };
 
-  const handleAddPost = (e: React.FormEvent) => {
+  const handleAddPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPostName.trim() || !newPostText.trim()) return;
-    
+
     const newPost = {
       name: newPostName.trim(),
       text: newPostText.trim(),
       time: "Just now"
     };
-    const updated = [newPost, ...forumPosts];
+
+    const remotePost = await saveForumPostToSupabase({
+      author_name: newPostName.trim(),
+      message: newPostText.trim(),
+    });
+
+    const hydratedPost = remotePost
+      ? {
+          name: remotePost.author_name,
+          text: remotePost.message,
+          time: new Date(remotePost.created_at).toLocaleString("en", {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          }),
+        }
+      : newPost;
+
+    const updated = [hydratedPost, ...forumPosts];
     setForumPosts(updated);
     localStorage.setItem("portfolio_forum_posts", JSON.stringify(updated));
     setNewPostName("");
     setNewPostText("");
   };
 
-  const handleTicketSubmit = (e: React.FormEvent) => {
+  const handleTicketSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reportDesc.trim()) return;
 
     setIsSubmittingReport(true);
     setReportProgress(0);
-    
+
     const interval = setInterval(() => {
       setReportProgress((prev) => {
         if (prev >= 100) {
@@ -139,16 +196,37 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
           const tktId = `TKT-${Math.floor(1000 + Math.random() * 9000)}-${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
           setSubmittedTicket(tktId);
           setIsSubmittingReport(false);
-          
+
           const newTicket = {
             id: tktId,
             category: reportCategory,
             severity: reportSeverity,
             desc: reportDesc
           };
-          const updatedTickets = [newTicket, ...ticketsList];
-          setTicketsList(updatedTickets);
-          localStorage.setItem("portfolio_tickets", JSON.stringify(updatedTickets));
+
+          void saveReportToSupabase({
+            category: reportCategory,
+            severity: reportSeverity,
+            description: reportDesc,
+          }).then((remoteTicket) => {
+            if (remoteTicket) {
+              const hydratedTicket = {
+                id: remoteTicket.id,
+                category: remoteTicket.category,
+                severity: remoteTicket.severity,
+                desc: remoteTicket.description,
+              };
+
+              const updatedTickets = [hydratedTicket, ...ticketsList];
+              setTicketsList(updatedTickets);
+              localStorage.setItem("portfolio_tickets", JSON.stringify(updatedTickets));
+            } else {
+              const updatedTickets = [newTicket, ...ticketsList];
+              setTicketsList(updatedTickets);
+              localStorage.setItem("portfolio_tickets", JSON.stringify(updatedTickets));
+            }
+          });
+
           setReportDesc("");
           return 100;
         }
