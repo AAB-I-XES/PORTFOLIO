@@ -175,8 +175,8 @@ export default function BioSection() {
                     )}
 
                     <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-full bg-[#141414]/55 px-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.28em] text-white/90 backdrop-blur-sm">
-                      <span>{card.title}</span>
-                      <span>{isActive ? "Active" : "Preview"}</span>
+                      <span>Profile</span>
+                      <span>{isActive ? "Focus" : "View"}</span>
                     </div>
                   </motion.button>
                 );
