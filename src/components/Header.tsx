@@ -52,19 +52,19 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
   const extrasCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const menuItems = [
-    { id: "hero", label: "01", title: "GENESIS", subtitle: "HOME // LAUNCHPAD & CORE MISSION", spec: "MODEL_v3.5" },
-    { id: "bio", label: "02", title: "CREATOR", subtitle: "ABOUT // PHILOSOPHY & STORY", spec: "BIOGRAPHY" },
-    { id: "skills", label: "03", title: "FORGE", subtitle: "SKILLS // STACK & CAPABILITIES", spec: "SYS_ENG_v1" },
-    { id: "projects", label: "04", title: "ARCHIVES", subtitle: "WORKS // CURATED PORTFOLIO", spec: "GIT_REPOS" },
-    { id: "contact", label: "05", title: "DIRECT", subtitle: "CONTACT // REACH OUT TO COLLAB", spec: "SECURE_CONN" }
+    { id: "hero", label: "01", title: "Home", subtitle: "Overview", spec: "Home" },
+    { id: "bio", label: "02", title: "About", subtitle: "Biography", spec: "About" },
+    { id: "skills", label: "03", title: "Skills", subtitle: "Capabilities", spec: "Skills" },
+    { id: "projects", label: "04", title: "Projects", subtitle: "Work", spec: "Projects" },
+    { id: "contact", label: "05", title: "Contact", subtitle: "Reach out", spec: "Contact" }
   ];
 
   const navPills = [
-    { id: "home", label: "home" },
-    { id: "extras", label: "extras" },
-    { id: "faq", label: "faq" },
-    { id: "forum", label: "forum" },
-    { id: "report", label: "report issue" }
+    { id: "home", label: "Home" },
+    { id: "extras", label: "Extras" },
+    { id: "faq", label: "FAQ" },
+    { id: "forum", label: "Forum" },
+    { id: "report", label: "Report" }
   ];
 
   // Sync forum and ticket lists from localStorage
@@ -563,11 +563,10 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
                   <Compass className="w-5 h-5 animate-spin-slow text-[#e05050]" style={{ animationDuration: "12s" }} />
                 </div>
                 <h3 className="font-serif italic text-3.5xl text-[#141414] leading-tight font-normal">
-                  Where organic drafts match strict system architecture.
+                  “Design is the bridge between intention and clarity.”
                 </h3>
                 <p className="font-mono text-[10px] text-[#141414]/60 uppercase tracking-widest leading-relaxed">
-                  [ DIRTY RECON // AAB-I-XES ]<br />
-                  CURATOR DIBYAJYOTI RABHA DEPLOYS FREE-HAND VECTORS, MATHEMATICAL ALIGNMENT SNAPS, AND ELABORATED TYPE PAIRINGS TO CRAFT VISUALLY DISTINCT PLATFORMS.
+                  A simple reminder that shapes the way this portfolio is built.
                 </p>
               </div>
 
