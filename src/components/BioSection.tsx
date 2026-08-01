@@ -2,11 +2,19 @@ import React, { useRef, useState } from "react";
 import { motion, useScroll, useTransform, useSpring } from "motion/react";
 import { PenTool } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
+import ovcharBg from "../../assets/ovchar.png";
 
+const HERO_CHARACTER_PHOTO = ovcharBg;
 const GITHUB_PROFILE_PHOTO = "https://github.com/AAB-I-XES.png";
 const LINKEDIN_PROFILE_PHOTO = "https://github.com/AAB-I-XES.png";
 
 const PROFILE_CARDS = [
+  {
+    id: "hero-character",
+    title: "Character",
+    subtitle: "Visual Identity",
+    image: HERO_CHARACTER_PHOTO,
+  },
   {
     id: "github",
     title: "GitHub",
@@ -35,7 +43,7 @@ const PROFILE_CARDS = [
 
 export default function BioSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [activeCardIdx, setActiveCardIdx] = useState(1);
+  const [activeCardIdx, setActiveCardIdx] = useState(2);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
