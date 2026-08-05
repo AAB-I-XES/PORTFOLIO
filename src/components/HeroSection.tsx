@@ -134,10 +134,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           >
             Contact for Info
           </button>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#141414]/10 bg-[#f5f2ed]/85 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#141414]/70 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
-            {BIO_SUMMARY.availability}
-          </div>
+          <div className="hidden" />
         </motion.div>
 
         {/* B. HERO TYPOGRAPHY FRAME */}
@@ -200,9 +197,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
               ))}
             </div>
             
-            <div className="absolute bg-[#f5f2ed] px-4 font-mono text-[9px] uppercase tracking-widest text-[#141414]/40">
-              TACTILE VECTOR ENGINE
-            </div>
+            <div className="absolute bg-[#f5f2ed] px-4 font-mono text-[9px] uppercase tracking-widest text-[#141414]/40" />
           </div>
 
           {/* Subtitle / Tagline */}

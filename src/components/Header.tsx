@@ -731,9 +731,6 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
             >
               <div className="flex justify-between items-center font-mono text-[8px] tracking-widest text-[#141414]/40 uppercase font-black border-b border-[#141414]/10 pb-4">
                 <span>MODULE // SKETCHBOOK DIRECTORY</span>
-                <span className="flex items-center gap-1.5">
-                  <Activity className="w-3 h-3 text-[#e05050] animate-pulse" /> LIVE SCHEMATIC
-                </span>
               </div>
 
               <div className="mt-12 mb-auto space-y-6 max-w-sm pl-4 border-l-2 border-[#e05050]/40 py-2">
@@ -750,7 +747,6 @@ export default function Header({ onNavClick, isMenuOpen, setIsMenuOpen }: Header
 
               <div className="flex items-center gap-3 text-[9px] font-mono tracking-widest text-[#141414]/40 font-bold mt-auto">
                 <Sparkles className="w-3.5 h-3.5 text-[#e05050] animate-pulse" />
-                <span>SPEC // DESIGN PLATFORM v2.5</span>
               </div>
             </motion.div>
 

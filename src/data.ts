@@ -85,13 +85,13 @@ export const SKILLS_CATEGORIES: SkillCategory[] = [
       },
       {
         name: "HTML5 & CSS3 Architecture",
-        level: 5,
+        level: 3,
         iconName: "FileCode",
         description: "Semantic structures, advanced typography systems, fluid grid layouts, and custom animations."
       },
       {
         name: "Modern JavaScript / TS",
-        level: 5,
+        level: 3,
         iconName: "Code2",
         description: "Reactive functional patterns, canvas manipulation, and smooth asynchronous rendering."
       }
@@ -103,19 +103,19 @@ export const SKILLS_CATEGORIES: SkillCategory[] = [
     skills: [
       {
         name: "React.js Framework",
-        level: 5,
+        level: 2,
         iconName: "Atom",
         description: "Component architecture, performance profiling, and state machines."
       },
       {
         name: "React Native",
-        level: 4,
+        level: 2,
         iconName: "Smartphone",
         description: "Native bridges, fluid gestures, offline state, and cross-platform UX."
       },
       {
         name: "Flutter & Dart",
-        level: 4,
+        level: 0,
         iconName: "Layers",
         description: "Reactive widget trees, hardware-accelerated rendering, and custom paints."
       }
@@ -127,13 +127,13 @@ export const SKILLS_CATEGORIES: SkillCategory[] = [
     skills: [
       {
         name: "Kotlin & Android Native",
-        level: 4,
+        level: 1,
         iconName: "SmartphoneCharging",
         description: "Jetpack Compose, background services, custom drawing canvas APIs, and memory optimization."
       },
       {
         name: "C / C++ Foundations",
-        level: 4,
+        level: 2,
         iconName: "Cpu",
         description: "Resource management, algorithms, memory layouts, and graphics math."
       }

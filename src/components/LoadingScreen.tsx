@@ -161,7 +161,7 @@ export default function LoadingScreen({ onComplete, onExitStart }: LoadingScreen
 
             {/* Bottom Info Bar */}
             <div className="flex flex-col sm:flex-row justify-between items-center font-mono text-[10px] tracking-wider text-[#141414]/40 border-t border-[#141414]/10 pt-4 gap-2 text-center">
-              <span>D.RABHA &copy; 2026 &mdash; ALL RIGHTS OBSERVED</span>
+              <span>D.RABHA &copy; 2026 &mdash; ALL RIGHTS RESERVED</span>
             </div>
           </motion.div>
         </motion.div>
