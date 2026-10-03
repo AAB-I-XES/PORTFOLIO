@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowDown, Compass, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
-import ovcharBg from "../../assets/ovchar.png";
-import GridDistortion from "./GridDistortion";
+import Beams from "./Beams";
 
 interface HeroSectionProps {
   onScrollToNext: () => void;
@@ -55,16 +54,24 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
     <section
       id="hero"
       onMouseMove={handleMouseMove}
-      className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 overflow-hidden select-none"
+      className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 overflow-hidden select-none bg-[#f5f2ed]"
     >
-      <GridDistortion
-        imageSrc={ovcharBg}
-        grid={10}
-        mouse={0.1}
-        strength={0.15}
-        relaxation={0.9}
-        className="absolute inset-0 z-0"
-      />
+      <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+        <div className="animated-gradient-background absolute inset-0" />
+        <Beams
+          beamWidth={3.5}
+          beamHeight={18}
+          beamNumber={8}
+          lightColor="#ffd6e0"
+          beamColor="#141414"
+          backgroundColor={null}
+          speed={2}
+          noiseIntensity={1.5}
+          scale={0.18}
+          rotation={18}
+        />
+      </div>
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.12),_transparent_55%)]" />
 
       {/* 1. ARCHITECTURAL DRAFTING PAPER BACKGROUND EFFECT */}
       <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.25]">
@@ -82,7 +89,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
             top: `${(mousePos.y + 0.5) * 100}%`,
           }}
         >
-          <div className="absolute inset-3 bg-[#ffd6e0]/60 rounded-full animate-ping" />
+          <div className="absolute inset-3 bg-[#141414]/10 rounded-full" />
         </div>
       </div>
 

@@ -133,7 +133,7 @@ interface BeamsProps {
   beamNumber?: number;
   lightColor?: string;
   beamColor?: string;
-  backgroundColor?: string;
+  backgroundColor?: string | null;
   speed?: number;
   noiseIntensity?: number;
   scale?: number;
@@ -328,7 +328,7 @@ if (uLightMode > 0.5) {
         <DirLight color={lightColor} position={[0, 3, 10]} />
       </group>
       <ambientLight intensity={1} />
-      <color attach="background" args={[backgroundColor]} />
+      {backgroundColor && <color attach="background" args={[backgroundColor]} />}
       <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={30} />
     </Canvas>
   );

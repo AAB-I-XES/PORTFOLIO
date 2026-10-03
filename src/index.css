@@ -76,15 +76,15 @@ html {
 
 .animated-gradient-background {
   background: linear-gradient(135deg,
-    rgba(255, 182, 207, 0.34) 0%,
-    rgba(230, 226, 217, 0.22) 30%,
-    rgba(20, 20, 20, 0.32) 60%,
-    rgba(255, 182, 207, 0.28) 100%);
+    rgba(255, 214, 224, 0.22) 0%,
+    rgba(230, 226, 217, 0.14) 30%,
+    rgba(20, 20, 20, 0.12) 60%,
+    rgba(255, 214, 224, 0.18) 100%);
   background-size: 400% 400%;
   animation: gradient-scroll 24s ease infinite;
-  filter: blur(32px);
-  opacity: 0.68;
-  transform: scale(1.08);
+  filter: blur(18px);
+  opacity: 0.28;
+  transform: scale(1.04);
 }
 
 @keyframes gradient-scroll {

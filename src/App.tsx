@@ -8,15 +8,13 @@ import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import { motion, AnimatePresence } from "motion/react";
-import Beams from "./components/Beams";
-import homeMenuImage from "../assets/ovchar.png";
 import aboutMenuImage from "../assets/pic3.jpg";
 import skillsMenuImage from "../assets/Firefly_Gemini Flash_remove the person statue here 336738.png";
 import projectsMenuImage from "../assets/bg-im2.png";
 import contactMenuImage from "../assets/bg-im3.png";
 
 const navigationItems: StaggeredMenuItem[] = [
-  { label: "Home", ariaLabel: "Go to home", link: "#hero", image: homeMenuImage },
+  { label: "Home", ariaLabel: "Go to home", link: "#hero" },
   { label: "About", ariaLabel: "Read about Dibyajyoti", link: "#bio", image: aboutMenuImage },
   { label: "Skills", ariaLabel: "View skills and expertise", link: "#skills", image: skillsMenuImage },
   { label: "Projects", ariaLabel: "Browse selected projects", link: "#projects", image: projectsMenuImage },
@@ -65,24 +63,7 @@ export default function App() {
   }, [isLoading, isMenuOpen]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden select-none">
-      <div className="absolute inset-0 -z-10 pointer-events-none">
-        <div className="animated-gradient-background absolute inset-0" />
-      </div>
-      <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
-        <Beams
-          beamWidth={3.5}
-          beamHeight={18}
-          beamNumber={8}
-          lightColor="#ffffff"
-          beamColor="#000000"
-          backgroundColor="#000000"
-          speed={2}
-          noiseIntensity={1.75}
-          scale={0.2}
-          rotation={18}
-        />
-      </div>
+    <div className="relative min-h-screen overflow-hidden select-none bg-[#f5f2ed]">
 
       {/* 1. Loading Preloader Screen */}
       <LoadingScreen 
@@ -124,7 +105,7 @@ export default function App() {
               }}
               transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
               className="relative min-h-screen text-[#141414] overflow-x-hidden shadow-2xl pointer-events-auto origin-center"
-              style={{ backgroundColor: "rgba(245,242,237,0.24)" }}
+              style={{ backgroundColor: "#f5f2ed" }}
             >
               {/* If menu is open, render a clean interceptor overlay to safely snap back on click with soft shadow */}
               {isMenuOpen && (
