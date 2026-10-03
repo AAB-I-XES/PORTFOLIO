@@ -35,6 +35,7 @@ interface PosterMedia {
   index: number;
   height: number;
   width: number;
+  angle: number;
 }
 
 const vertexShader = `
@@ -43,37 +44,10 @@ attribute vec3 position;
 attribute vec2 uv;
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
-uniform float uPosition;
-uniform float uDistortion;
-uniform vec3 distortionAxis;
-uniform vec3 rotationAxis;
 varying vec2 vUv;
-const float PI = 3.141592653589793238;
-
-mat4 rotationMatrix(vec3 axis, float angle) {
-  axis = normalize(axis);
-  float s = sin(angle);
-  float c = cos(angle);
-  float oc = 1.0 - c;
-  return mat4(
-    oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s, 0.0,
-    oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 0.0,
-    oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, oc * axis.z * axis.z + c, 0.0,
-    0.0, 0.0, 0.0, 1.0
-  );
-}
-
-float qinticInOut(float t) {
-  return t < 0.5 ? 16.0 * pow(t, 5.0) : -0.5 * abs(pow(2.0 * t - 2.0, 5.0)) + 1.0;
-}
-
 void main() {
   vUv = uv;
-  float offset = (dot(distortionAxis, position) + 0.25) / 0.5;
-  float progress = clamp((fract(uPosition * 0.05) - 0.01 * uDistortion * offset) / (1.0 - 0.01 * uDistortion), 0.0, 1.0);
-  float angle = qinticInOut(progress) * PI;
-  vec3 transformed = (rotationMatrix(rotationAxis, angle) * vec4(position, 1.0)).xyz;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }`;
 
 const fragmentShader = `
@@ -106,7 +80,7 @@ export default function FlyingPosters({
   planeWidth = 340,
   planeHeight = 390,
   gap = 44,
-  distortion = 3,
+  distortion = 2.2,
   scrollEase = 0.075,
   cameraFov = 45,
   cameraZ = 20,
@@ -198,12 +172,8 @@ export default function FlyingPosters({
         fragment: fragmentShader,
         uniforms: {
           tMap: { value: texture },
-          uPosition: { value: 0 },
           uPlaneSize: { value: [0, 0] },
           uImageSize: { value: [1, 1] },
-          uDistortion: { value: distortion },
-          distortionAxis: { value: [1, 1, 0] },
-          rotationAxis: { value: [0, 1, 0] },
         },
         depthTest: false,
         depthWrite: false,
@@ -219,6 +189,7 @@ export default function FlyingPosters({
         index,
         height: 1,
         width: 1,
+        angle: 0,
       });
     });
 
@@ -255,9 +226,15 @@ export default function FlyingPosters({
         if (offset > items.length / 2) offset -= items.length;
         else if (offset < -items.length / 2) offset += items.length;
 
+        const isSelected = media.index === activeIndex;
+        const targetAngle = isSelected ? 0 : offset * Math.min(distortion * 0.12, 0.48);
+        media.angle += (targetAngle - media.angle) * scrollEase;
+        const angle = media.angle;
+        const radius = step * 1.65;
         media.mesh.position.y = -offset * step;
-        const position = ((media.mesh.position.y + viewport.height) / (2 * viewport.height)) * 10 + 5;
-        media.program.uniforms.uPosition.value = position;
+        media.mesh.position.x = Math.sin(angle) * radius;
+        media.mesh.position.z = (Math.cos(angle) - 1) * radius;
+        media.mesh.rotation.y = -angle;
         if (media.image.complete && media.image.naturalWidth > 0) {
           media.program.uniforms.uImageSize.value = [media.image.naturalWidth, media.image.naturalHeight];
         }
