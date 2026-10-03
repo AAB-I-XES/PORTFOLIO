@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowDown, Compass, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
 import Beams from "./Beams";
+import TextLoop from "./TextLoop";
 
 interface HeroSectionProps {
   onScrollToNext: () => void;
@@ -106,7 +107,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
       </div>
 
       {/* Top spacing placeholder matching Header layout */}
-      <div className="h-16 w-full relative z-10" />
+      <div className="h-24 w-full relative z-10 md:h-28" />
 
       {/* Main Core Content Container */}
       <div className="relative w-full flex-1 flex flex-col justify-center items-center z-10 max-w-6xl px-4 sm:px-6">
@@ -120,10 +121,25 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
         >
           <button
             type="button"
+            aria-label="Contact for info"
             onClick={handleContactClick}
-            className="inline-flex items-center gap-2 rounded-full border border-[#141414]/10 bg-white/80 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.35em] text-[#141414] shadow-sm transition hover:bg-white"
+            className="block border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#141414]"
           >
-            Contact for Info
+            <TextLoop
+              className="text-loop-contact"
+              text="Contact for info"
+              shape="wave"
+              speed={55}
+              separator="✦"
+              curviness={12}
+              fontSize={64}
+              fontWeight={700}
+              letterSpacing={3}
+              color="#ededed"
+              ribbonColor="#141414"
+              ribbonWidth={50}
+              pauseOnHover
+            />
           </button>
           <div className="hidden" />
         </motion.div>

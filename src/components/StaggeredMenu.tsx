@@ -192,20 +192,36 @@ export default function StaggeredMenu({
   const closeTweenRef = useRef<gsap.core.Tween | null>(null);
   const [open, setOpen] = useState(false);
 
-  const offscreen = position === "left" ? -100 : 100;
-
   useLayoutEffect(() => {
     const panel = panelRef.current;
     const wrapper = wrapperRef.current;
     if (!panel || !wrapper) return;
     const layers = Array.from(wrapper.querySelectorAll<HTMLElement>(".sm-prelayer"));
+    const headerItems = Array.from(wrapper.querySelectorAll<HTMLElement>(".sm-logo, .sm-toggle"));
     const context = gsap.context(() => {
-      gsap.set([panel, ...layers], { xPercent: offscreen, opacity: 1 });
+      gsap.set([panel, ...layers], { yPercent: -100, opacity: 1 });
       gsap.set(toggleRef.current, { color: menuButtonColor });
       gsap.set(iconRef.current, { rotate: 0 });
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      gsap.fromTo(
+        headerItems,
+        {
+          autoAlpha: 0,
+          y: -40,
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1.5,
+          delay: 0.1,
+          ease: "power3.out",
+          clearProps: "transform,opacity,visibility",
+        },
+      );
     }, wrapper);
     return () => context.revert();
-  }, [menuButtonColor, offscreen]);
+  }, [menuButtonColor]);
 
   const closeMenu = useCallback(() => {
     if (!openRef.current) return;
@@ -220,7 +236,7 @@ export default function StaggeredMenu({
     const layers = Array.from(wrapper.querySelectorAll<HTMLElement>(".sm-prelayer"));
     closeTweenRef.current?.kill();
     closeTweenRef.current = gsap.to([...layers, panel], {
-      xPercent: offscreen,
+      yPercent: -100,
       duration: 0.42,
       stagger: { each: 0.045, from: "end" },
       ease: "power3.in",
@@ -231,7 +247,7 @@ export default function StaggeredMenu({
     if (toggleRef.current && changeMenuColorOnOpen) {
       gsap.to(toggleRef.current, { color: menuButtonColor, duration: 0.25, overwrite: "auto" });
     }
-  }, [changeMenuColorOnOpen, menuButtonColor, offscreen, onMenuClose]);
+  }, [changeMenuColorOnOpen, menuButtonColor, onMenuClose]);
 
   const openMenu = useCallback(() => {
     if (busyRef.current || openRef.current) return;
@@ -259,8 +275,8 @@ export default function StaggeredMenu({
     const timeline = gsap.timeline({
       onComplete: () => { busyRef.current = false; },
     });
-    timeline.to(layers, { xPercent: 0, duration: 0.55, stagger: 0.075, ease: "power4.out" }, 0);
-    timeline.to(panel, { xPercent: 0, duration: 0.66, ease: "power4.out" }, 0.1);
+    timeline.to(layers, { yPercent: 0, duration: 0.55, stagger: 0.075, ease: "power4.out" }, 0);
+    timeline.to(panel, { yPercent: 0, duration: 0.66, ease: "power4.out" }, 0.1);
     timeline.to(labels, { yPercent: 0, rotate: 0, duration: 0.8, stagger: 0.085, ease: "power4.out" }, 0.3);
     timeline.to(numberedItems, { "--sm-num-opacity": 1, duration: 0.5, stagger: 0.06, ease: "power2.out" }, 0.42);
     timeline.to([socialTitle, ...socialLinks].filter(Boolean), {

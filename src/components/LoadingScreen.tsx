@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface LoadingScreenProps {
@@ -6,32 +6,44 @@ interface LoadingScreenProps {
   onExitStart?: () => void;
 }
 
+const SHUTTER_COUNT = 5;
+const LOAD_DURATION = 2800;
+const EXIT_DURATION = 1500;
+
 export default function LoadingScreen({ onComplete, onExitStart }: LoadingScreenProps) {
   const [progress, setProgress] = useState(0);
   const [isDone, setIsDone] = useState(false);
+  const onCompleteRef = useRef(onComplete);
+  const onExitStartRef = useRef(onExitStart);
+
+  onCompleteRef.current = onComplete;
+  onExitStartRef.current = onExitStart;
 
   useEffect(() => {
-    const duration = 2800; // 2.8 seconds loader (slower, more comfortable build-up)
-    const intervalTime = 20;
-    const step = 100 / (duration / intervalTime);
-    
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setTimeout(() => {
-            setIsDone(true);
-            if (onExitStart) onExitStart();
-            setTimeout(onComplete, 2900); // Wait for the longer elegant exit animation (2.9s)
-          }, 500);
-          return 100;
-        }
-        return Math.min(prev + step, 100);
-      });
-    }, intervalTime);
+    const startedAt = performance.now();
+    let exitTimer: number | undefined;
+    let completeTimer: number | undefined;
+    const progressTimer = window.setInterval(() => {
+      const elapsed = performance.now() - startedAt;
+      const nextProgress = Math.min((elapsed / LOAD_DURATION) * 100, 100);
+      setProgress(nextProgress);
 
-    return () => clearInterval(timer);
-  }, [onComplete, onExitStart]);
+      if (nextProgress >= 100) {
+        window.clearInterval(progressTimer);
+        exitTimer = window.setTimeout(() => {
+          onExitStartRef.current?.();
+          setIsDone(true);
+          completeTimer = window.setTimeout(() => onCompleteRef.current(), EXIT_DURATION);
+        }, 300);
+      }
+    }, 24);
+
+    return () => {
+      window.clearInterval(progressTimer);
+      if (exitTimer !== undefined) window.clearTimeout(exitTimer);
+      if (completeTimer !== undefined) window.clearTimeout(completeTimer);
+    };
+  }, []);
 
   return (
     <AnimatePresence>
@@ -39,131 +51,178 @@ export default function LoadingScreen({ onComplete, onExitStart }: LoadingScreen
         <motion.div
           id="loading-screen"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { delay: 2.7, duration: 0.2 } }}
-          className="fixed inset-0 z-[150] overflow-hidden select-none bg-transparent"
+          exit={{ opacity: 0, transition: { duration: 0.55, ease: "easeOut" } }}
+          className="fixed inset-0 z-[150] overflow-hidden select-none bg-[#ededed] text-[#141414]"
+          aria-label="Loading portfolio"
+          role="status"
         >
-          {/* Staggered Vertical Shutter Panels (Slide away on exit) */}
-          <div className="absolute inset-0 z-0 flex">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="animated-gradient-background absolute inset-0" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.18),_transparent_55%)]" />
+          <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.22]" aria-hidden="true">
+            <div className="absolute left-0 top-[35%] h-px w-full bg-[#141414]/10" />
+            <div className="absolute left-0 top-[65%] h-px w-full bg-[#141414]/10" />
+            <div className="absolute left-[25%] top-0 h-full w-px bg-[#141414]/10" />
+            <div className="absolute left-[75%] top-0 h-full w-px bg-[#141414]/10" />
+          </div>
+          <motion.div
+            className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/55 to-transparent"
+            animate={{ x: ["0vw", "160vw"] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: "linear" }}
+          />
+
+          <div className="pointer-events-none absolute inset-4 border border-[#141414]/10 md:inset-8">
+            <span className="absolute -left-px -top-px h-8 w-8 border-l-2 border-t-2 border-[#141414]/35" />
+            <span className="absolute -right-px -top-px h-8 w-8 border-r-2 border-t-2 border-[#141414]/35" />
+            <span className="absolute -bottom-px -left-px h-8 w-8 border-b-2 border-l-2 border-[#141414]/35" />
+            <span className="absolute -bottom-px -right-px h-8 w-8 border-b-2 border-r-2 border-[#141414]/35" />
+            <span className="absolute left-3 top-3 font-mono text-[8px] tracking-[0.2em] text-[#141414]/35">
+              DRAFT_SHEET / 01
+            </span>
+            <span className="absolute right-3 top-3 font-mono text-[8px] tracking-[0.2em] text-[#141414]/35">
+              GUWAHATI / IN
+            </span>
+          </div>
+
+          <div className="absolute inset-0 z-10 flex flex-col justify-between px-8 py-8 md:px-16 md:py-12">
+            <header className="flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#141414]/60 sm:text-xs">
+              <span className="font-semibold text-[#141414]">Dibyajyoti Rabha</span>
+              <span className="hidden sm:block">Creative developer / Illustrator</span>
+            </header>
+
+            <main className="mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+              <div className="relative mb-8 grid h-36 w-36 place-items-center sm:mb-9 sm:h-40 sm:w-40">
+                <motion.div
+                  className="absolute inset-0 rounded-full border border-[#141414]/15"
+                  animate={{ rotate: 360, scale: [1, 1.04, 1] }}
+                  transition={{ rotate: { duration: 18, repeat: Infinity, ease: "linear" }, scale: { duration: 3, repeat: Infinity, ease: "easeInOut" } }}
+                />
+                <motion.div
+                  className="absolute inset-3 rounded-full border border-dashed border-[#141414]/25"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 11, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.div
+                  className="absolute inset-0"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                >
+                  <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 rounded-full bg-[#141414]" />
+                </motion.div>
+                <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-[#141414]/10" />
+                <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-[#141414]/10" />
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.55, rotate: -18 }}
+                  animate={{ opacity: 1, scale: [1, 1.06, 1], rotate: 0 }}
+                  transition={{ opacity: { delay: 0.25, duration: 0.45 }, scale: { delay: 0.5, duration: 2.4, repeat: Infinity }, rotate: { delay: 0.25, duration: 0.7 } }}
+                  className="relative z-10 font-display text-6xl tracking-[-0.12em] text-[#141414]"
+                  aria-hidden="true"
+                >
+                  DR
+                </motion.span>
+                <span className="absolute bottom-[-1.15rem] font-mono text-[8px] tracking-[0.25em] text-[#141414]/45">
+                  DESIGN / ENGINEERING
+                </span>
+              </div>
+
+              <p className="font-mono text-[9px] uppercase tracking-[0.35em] text-[#141414]/50 sm:text-[10px]">
+                Studio of / Guwahati, India
+              </p>
+              <h1 className="mt-3 flex flex-col font-display text-[clamp(2.4rem,8vw,5.5rem)] uppercase leading-[0.82] tracking-[0.035em]">
+                {["DIBYAJYOTI", "RABHA"].map((line, lineIndex) => (
+                  <span key={line} className="flex justify-center overflow-hidden py-1">
+                    {Array.from(line).map((letter, letterIndex) => (
+                      <motion.span
+                        key={`${line}-${letterIndex}`}
+                        initial={{ y: "110%", opacity: 0, rotateX: -70 }}
+                        animate={{ y: "0%", opacity: 1, rotateX: 0 }}
+                        transition={{
+                          delay: 0.38 + lineIndex * 0.24 + letterIndex * 0.045,
+                          duration: 0.72,
+                          ease: [0.16, 1, 0.3, 1],
+                        }}
+                        className="inline-block"
+                        aria-hidden="true"
+                      >
+                        {letter}
+                      </motion.span>
+                    ))}
+                  </span>
+                ))}
+                <span className="sr-only">Dibyajyoti Rabha</span>
+              </h1>
               <motion.div
-                key={i}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 1.05, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="mt-4 h-px w-full max-w-sm origin-left bg-[#141414]/35"
+              />
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.15, duration: 0.55 }}
+                className="mt-4 font-mono text-[9px] uppercase tracking-[0.25em] text-[#141414]/55 sm:text-[10px]"
+              >
+                Creative developer <span className="px-2">/</span> Illustrator
+              </motion.p>
+              <p className="mt-3 max-w-sm text-xs leading-6 text-[#141414]/55 sm:text-sm">
+                Bringing ideas to life through thoughtful design and code.
+              </p>
+
+              {/* Loading status */}
+              <div className="mt-7 w-full max-w-xs">
+                <div className="mb-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-[#141414]/50">
+                  <span>Rendering experience</span>
+                  <span>{Math.round(progress).toString().padStart(2, "0")}%</span>
+                </div>
+                <div
+                  className="relative h-[3px] w-full overflow-hidden bg-[#141414]/10"
+                  role="progressbar"
+                  aria-label="Loading portfolio"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(progress)}
+                >
+                  <motion.div
+                    className="h-full bg-[#141414]"
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.12, ease: "linear" }}
+                  />
+                  <motion.div
+                    className="absolute inset-y-0 w-10 bg-gradient-to-r from-transparent via-white/80 to-transparent"
+                    animate={{ left: ["-2.5rem", "100%"] }}
+                    transition={{ duration: 1.1, repeat: Infinity, ease: "linear" }}
+                  />
+                </div>
+              </div>
+            </main>
+
+            <footer className="flex items-end justify-between gap-4 border-t border-[#141414]/15 pt-4 font-mono text-[8px] uppercase tracking-[0.16em] text-[#141414]/45 sm:text-[9px]">
+              <span>Independent digital studio</span>
+              <span>Portfolio / 2026</span>
+            </footer>
+          </div>
+
+          <div className="absolute inset-0 z-0 flex" aria-hidden="true">
+            {Array.from({ length: SHUTTER_COUNT }, (_, index) => (
+              <motion.div
+                key={index}
                 initial={{ scaleY: 1 }}
-                exit={{ 
+                exit={{
                   scaleY: 0,
-                  transition: { 
-                    duration: 1.8, 
-                    delay: 0.2 + i * 0.24, 
-                    ease: [0.16, 1, 0.3, 1] 
-                  } 
+                  transition: {
+                    duration: 1.05,
+                    delay: index * 0.11,
+                    ease: [0.76, 0, 0.24, 1],
+                  },
                 }}
-                style={{ originY: i % 2 === 0 ? 0 : 1 }}
-                className="flex-1 h-full bg-[#ededed] border-r border-[#141414]/5 last:border-r-0"
+                style={{
+                  originY: index % 2 === 0 ? 0 : 1,
+                  backgroundColor: index % 2 === 0 ? "#ededed" : "#e3e3e3",
+                }}
+                className="h-full flex-1 border-r border-[#141414]/[0.035] last:border-r-0"
               />
             ))}
           </div>
-
-          {/* Core Loading Content (Fades out early during transition) */}
-          <motion.div
-            initial={{ opacity: 1, scale: 1 }}
-            exit={{ 
-              opacity: 0, 
-              scale: 0.94, 
-              filter: "blur(10px)", 
-              transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
-            }}
-            className="absolute inset-0 z-10 flex flex-col justify-between p-8 md:p-12 bg-transparent"
-          >
-            {/* Top Line & Labels */}
-            <div className="flex justify-between items-center font-mono text-xs tracking-widest text-[#141414]/60">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#141414] animate-ping" />
-                <span>DIBYAJYOTI RABHA</span>
-              </div>
-            </div>
-
-            {/* Central Sketch Animation */}
-            <div className="flex flex-col items-center justify-center my-auto relative">
-              {/* Elegant Sketch Frame Box */}
-              <div className="w-64 h-64 md:w-80 md:h-80 border border-[#141414]/10 flex items-center justify-center relative bg-white/45 rounded-lg p-6 overflow-hidden shadow-sm">
-                <div className="absolute inset-0 sketch-grid-dark opacity-10" />
-                
-                {/* Handcrafted drawing path that auto-draws */}
-                <svg className="w-full h-full relative z-10 text-[#141414]" viewBox="0 0 100 100" fill="none">
-                  {/* Decorative background circle */}
-                  <circle cx="50" cy="50" r="35" stroke="currentColor" strokeWidth="0.5" strokeDasharray="4 4" className="opacity-30" />
-                  
-                  {/* Handdrawn style initial outlines */}
-                  <motion.path
-                    d="M25 35 C35 25, 65 25, 75 35 C85 45, 85 55, 75 65 C65 75, 35 75, 25 65 C15 55, 15 45, 25 35 Z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2.6, ease: "easeInOut" }}
-                  />
-                  
-                  {/* Internal stylized geometry representing "D" & "R" */}
-                  <motion.path
-                    d="M40 32 L40 68"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 0.4, duration: 2.0, ease: "easeInOut" }}
-                  />
-                  <motion.path
-                    d="M40 32 C55 32, 58 45, 40 48"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 0.8, duration: 1.8, ease: "easeInOut" }}
-                  />
-                  <motion.path
-                    d="M40 48 C55 48, 62 68, 58 68"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 1.1, duration: 1.8, ease: "easeInOut" }}
-                  />
-                  <motion.path
-                    d="M28 50 L72 50"
-                    stroke="#777777"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 0.7, duration: 2.2, ease: "easeInOut" }}
-                  />
-                </svg>
-
-                {/* Little label */}
-                <div className="absolute bottom-4 left-0 right-0 text-center font-mono text-[10px] tracking-wider text-[#141414]/40">
-                  [ ASSEMBLING VECTOR ASSETS ]
-                </div>
-              </div>
-
-              {/* Live progress percentage */}
-              <div className="mt-8 text-center">
-                <div className="font-serif italic text-6xl text-[#141414] font-normal tracking-tighter">
-                  {Math.round(progress)}<span className="text-xs font-mono align-super">%</span>
-                </div>
-                <div className="font-mono text-xs tracking-[0.3em] uppercase mt-2 text-[#141414]/60 font-bold">
-                  Crafting Canvas
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Info Bar */}
-            <div className="flex flex-col sm:flex-row justify-between items-center font-mono text-[10px] tracking-wider text-[#141414]/40 border-t border-[#141414]/10 pt-4 gap-2 text-center">
-              <span>D.RABHA &copy; 2026 &mdash; ALL RIGHTS RESERVED</span>
-            </div>
-          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

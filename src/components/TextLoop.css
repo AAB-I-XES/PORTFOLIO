@@ -1,0 +1,29 @@
+.text-loop {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.text-loop-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.text-loop-text {
+  user-select: none;
+}
+
+.text-loop-measure {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.text-loop-contact {
+  width: min(300px, 85vw);
+  height: 40px;
+}
+
+.text-loop-contact .text-loop-svg {
+  height: 100%;
+}

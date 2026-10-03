@@ -7,7 +7,8 @@ import SkillsSection from "./components/SkillsSection";
 import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import Beams from "./components/Beams";
 import aboutMenuImage from "../assets/pic3.jpg";
 import skillsMenuImage from "../assets/Firefly_Gemini Flash_remove the person statue here 336738.png";
 import projectsMenuImage from "../assets/bg-im2.png";
@@ -27,8 +28,10 @@ const socialItems = [
 ];
 
 export default function App() {
+  const prefersReducedMotion = useReducedMotion();
   const [isLoading, setIsLoading] = useState(true);
   const [isExitingLoader, setIsExitingLoader] = useState(false);
+  const [isBeamTransitionActive, setIsBeamTransitionActive] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Scroll to targeted element with custom smooth offset handling
@@ -40,6 +43,9 @@ export default function App() {
         block: "start"
       });
     }
+  };
+  const handleMenuItemSelect = (item: StaggeredMenuItem) => {
+    handleScrollToSection(item.link.replace(/^#/, ""));
   };
   const handleScrollToNext = () => {
     handleScrollToSection("bio");
@@ -68,8 +74,53 @@ export default function App() {
       {/* 1. Loading Preloader Screen */}
       <LoadingScreen 
         onComplete={() => setIsLoading(false)} 
-        onExitStart={() => setIsExitingLoader(true)}
+        onExitStart={() => {
+          setIsExitingLoader(true);
+          setIsBeamTransitionActive(!prefersReducedMotion);
+        }}
       />
+
+      <AnimatePresence>
+        {isBeamTransitionActive && (
+          <motion.div
+            initial={{
+              clipPath: "circle(0% at 50% 50%)",
+              opacity: 0,
+              filter: "blur(12px)",
+            }}
+            animate={{
+              clipPath: [
+                "circle(0% at 50% 50%)",
+                "circle(85% at 50% 50%)",
+                "circle(150% at 50% 50%)",
+              ],
+              opacity: [0, 0.9, 0],
+              filter: ["blur(12px)", "blur(0px)", "blur(8px)"],
+            }}
+            transition={{
+              duration: 1.8,
+              times: [0, 0.32, 1],
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            onAnimationComplete={() => setIsBeamTransitionActive(false)}
+            className="pointer-events-none fixed inset-0 z-[145]"
+            aria-hidden="true"
+          >
+            <Beams
+              beamWidth={3.5}
+              beamHeight={18}
+              beamNumber={8}
+              lightColor="#ffffff"
+              beamColor="#141414"
+              backgroundColor={null}
+              speed={2}
+              noiseIntensity={1.5}
+              scale={0.18}
+              rotation={18}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 2. Main Site Contents (Revealed after loading completes) */}
       <AnimatePresence>
@@ -90,21 +141,30 @@ export default function App() {
               accentColor="#d7d7d7"
               onMenuOpen={() => setIsMenuOpen(true)}
               onMenuClose={() => setIsMenuOpen(false)}
-              onItemSelect={(item) => handleScrollToSection(item.link.replace(/^#/, ""))}
+              onItemSelect={handleMenuItemSelect}
             />
 
             {/* The Main Webpage Canvas */}
             <motion.div
-              initial={{ opacity: 0, scale: 1.06, y: 30, filter: "blur(12px)" }}
+              initial={prefersReducedMotion
+                ? { opacity: 0 }
+                : {
+                    opacity: 0,
+                    scale: 1.035,
+                    y: 24,
+                    filter: "blur(14px)",
+                    clipPath: "inset(48% 0 48% round 24px)",
+                  }}
               animate={{
                 opacity: 1,
                 scale: isMenuOpen ? 0.94 : 1,
                 y: isMenuOpen ? 24 : 0,
                 filter: "blur(0px)",
                 borderRadius: isMenuOpen ? "28px" : "0px",
+                clipPath: "inset(0% 0% 0% round 0px)",
               }}
-              transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-              className="relative min-h-screen text-[#141414] overflow-x-hidden shadow-2xl pointer-events-auto origin-center"
+              transition={{ duration: prefersReducedMotion ? 0.2 : 1.65, ease: [0.16, 1, 0.3, 1] }}
+              className="relative min-h-screen overflow-x-hidden shadow-2xl pointer-events-auto origin-center text-[#141414]"
               style={{ backgroundColor: "#ededed" }}
             >
               {/* If menu is open, render a clean interceptor overlay to safely snap back on click with soft shadow */}
@@ -119,22 +179,11 @@ export default function App() {
                 />
               )}
 
-              {/* Chapter I: The Genesis */}
               <HeroSection onScrollToNext={handleScrollToNext} />
-
-              {/* Chapter II: The Creative Self */}
               <BioSection />
-
-              {/* Chapter III: Craft & Sorcery */}
               <SkillsSection />
-
-              {/* Chapter IV: The Gallery of Works */}
               <ProjectsSection />
-
-              {/* Chapter V: Let's Build Together */}
               <ContactSection />
-
-              {/* Footer with quick utilities */}
               <Footer onScrollToTop={handleScrollToTop} />
             </motion.div>
           </>
