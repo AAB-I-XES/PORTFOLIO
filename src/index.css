@@ -13,16 +13,15 @@
   --color-brand-black: #141414;
 }
 
-/* Custom Scrollbar */
+/* Hide the scrollbar while preserving scroll behavior */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f5f2ed;
-}
-::-webkit-scrollbar-thumb {
-  background: #141414;
-  border-radius: 3px;
+  display: none;
 }
 
 /* Selection colors */
