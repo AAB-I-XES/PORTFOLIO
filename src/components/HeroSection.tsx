@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowDown, Compass, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
 import ovcharBg from "../../assets/ovchar.png";
+import GridDistortion from "./GridDistortion";
 
 interface HeroSectionProps {
   onScrollToNext: () => void;
@@ -11,9 +12,6 @@ interface HeroSectionProps {
 export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
   const [localTime, setLocalTime] = useState("");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const overlayParallaxX = mousePos.x * 22;
-  const overlayParallaxY = mousePos.y * 18;
 
   const handleContactClick = () => {
     const target = document.getElementById("contact");
@@ -57,33 +55,19 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
     <section
       id="hero"
       onMouseMove={handleMouseMove}
-      style={{
-        backgroundImage: `url(${ovcharBg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
-      }}
       className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 overflow-hidden select-none"
     >
-      {/* Full-bleed character overlay behind the content layer */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0 hidden md:block"
-        style={{
-          backgroundImage: `url(${ovcharBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center center",
-          backgroundRepeat: "no-repeat",
-          transform: `translate3d(${overlayParallaxX}px, ${overlayParallaxY}px, 0) scale(1.06)`,
-          transition: "transform 200ms ease-out",
-          willChange: "transform"
-        }}
+      <GridDistortion
+        imageSrc={ovcharBg}
+        grid={10}
+        mouse={0.1}
+        strength={0.15}
+        relaxation={0.9}
+        className="absolute inset-0 z-0"
       />
 
       {/* 1. ARCHITECTURAL DRAFTING PAPER BACKGROUND EFFECT */}
       <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.25]">
-        {/* Drafting Grid */}
-        <div className="absolute inset-0 sketch-grid" />
-        
         {/* Architectural guidelines crossing the screen */}
         <div className="absolute top-[35%] left-0 w-full h-[1px] bg-[#141414]/10" />
         <div className="absolute top-[65%] left-0 w-full h-[1px] bg-[#141414]/10" />

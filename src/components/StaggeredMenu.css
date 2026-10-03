@@ -1,0 +1,352 @@
+.staggered-menu-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 40;
+  pointer-events: none;
+  --sm-accent: #d7d7d7;
+}
+
+.staggered-menu-wrapper.fixed-wrapper {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.staggered-menu-header {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.staggered-menu-header > * {
+  pointer-events: auto;
+}
+
+.sm-logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #f4f4f4;
+  text-decoration: none;
+}
+
+.sm-logo-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 30%);
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+.sm-logo-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sm-logo-copy strong {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.sm-logo-copy small {
+  color: rgb(255 255 255 / 54%);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+}
+
+.sm-logo-img {
+  display: block;
+  width: auto;
+  height: 30px;
+  object-fit: contain;
+}
+
+.sm-toggle {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 15px;
+  border: 1px solid rgb(255 255 255 / 45%);
+  background: rgb(0 0 0 / 76%);
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.sm-toggle:focus-visible,
+.sm-panel-item:focus-visible,
+.sm-socials-link:focus-visible {
+  outline: 2px solid var(--sm-accent);
+  outline-offset: 4px;
+}
+
+.sm-icon {
+  position: relative;
+  display: inline-flex;
+  width: 15px;
+  height: 15px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 15px;
+}
+
+.sm-icon-line {
+  position: absolute;
+  width: 100%;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.sm-icon-line-v {
+  transform: rotate(90deg);
+}
+
+.sm-prelayers {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(470px, 43vw);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sm-prelayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+}
+
+.staggered-menu-panel {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: flex;
+  width: min(470px, 43vw);
+  height: 100%;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 112px 40px 36px;
+  background: #101010;
+  color: #f4f4f4;
+  opacity: 0;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+[data-position="left"] .sm-prelayers,
+[data-position="left"] .staggered-menu-panel {
+  right: auto;
+  left: 0;
+}
+
+.sm-panel-inner {
+  display: flex;
+  min-height: 100%;
+  flex: 1;
+  flex-direction: column;
+}
+
+.sm-panel-kicker {
+  margin: 0 0 26px;
+  color: rgb(255 255 255 / 48%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.sm-panel-list,
+.sm-socials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sm-panel-itemWrap {
+  overflow: hidden;
+  line-height: 1;
+}
+
+.sm-panel-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  padding-right: 2em;
+  color: #f4f4f4;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.08;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.sm-panel-item:hover {
+  color: var(--sm-accent);
+}
+
+.sm-panel-itemLabel {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.sm-marquee {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: #ededed;
+  color: #111;
+  pointer-events: none;
+  transform: translate3d(0, 101%, 0);
+}
+
+.sm-marquee-innerWrap {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sm-marquee-inner {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  height: 100%;
+  align-items: center;
+  will-change: transform;
+}
+
+.sm-marquee-part {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.sm-marquee-part > span:first-child {
+  padding: 0 12px;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sm-marquee-image {
+  display: block;
+  width: 108px;
+  height: 38px;
+  flex: 0 0 auto;
+  margin: 0 14px;
+  border-radius: 999px;
+  background-position: center;
+  background-size: cover;
+}
+
+.sm-panel-list[data-numbering] {
+  counter-reset: smItem;
+}
+
+.sm-panel-list[data-numbering] .sm-panel-item::after {
+  position: absolute;
+  top: 0.1em;
+  right: 0.3em;
+  color: var(--sm-accent);
+  content: counter(smItem, decimal-leading-zero);
+  counter-increment: smItem;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0;
+  z-index: 3;
+  opacity: var(--sm-num-opacity, 0);
+  pointer-events: none;
+}
+
+.sm-socials {
+  margin-top: auto;
+  padding-top: 32px;
+}
+
+.sm-socials-title {
+  margin: 0 0 12px;
+  color: rgb(255 255 255 / 48%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+}
+
+.sm-socials-list {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.sm-socials-link {
+  color: #f4f4f4;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.sm-socials-link:hover {
+  color: var(--sm-accent);
+}
+
+@media (max-width: 720px) {
+  .staggered-menu-header {
+    padding: 16px 18px;
+  }
+
+  .sm-logo-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sm-prelayers,
+  .staggered-menu-panel {
+    width: 100%;
+  }
+
+  .staggered-menu-panel {
+    padding: 104px 24px 26px;
+  }
+
+  .sm-panel-item {
+    font-size: clamp(2.25rem, 12vw, 3.5rem);
+  }
+
+  .sm-marquee-image {
+    width: 78px;
+    height: 32px;
+    margin: 0 10px;
+  }
+}

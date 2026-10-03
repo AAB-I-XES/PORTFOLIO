@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LoadingScreen from "./components/LoadingScreen";
-import Header from "./components/Header";
+import StaggeredMenu, { type StaggeredMenuItem } from "./components/StaggeredMenu";
 import HeroSection from "./components/HeroSection";
 import BioSection from "./components/BioSection";
 import SkillsSection from "./components/SkillsSection";
@@ -8,7 +8,25 @@ import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import { motion, AnimatePresence } from "motion/react";
-import bgImage from "../assets/bg-im.png";
+import Beams from "./components/Beams";
+import homeMenuImage from "../assets/ovchar.png";
+import aboutMenuImage from "../assets/pic3.jpg";
+import skillsMenuImage from "../assets/Firefly_Gemini Flash_remove the person statue here 336738.png";
+import projectsMenuImage from "../assets/bg-im2.png";
+import contactMenuImage from "../assets/bg-im3.png";
+
+const navigationItems: StaggeredMenuItem[] = [
+  { label: "Home", ariaLabel: "Go to home", link: "#hero", image: homeMenuImage },
+  { label: "About", ariaLabel: "Read about Dibyajyoti", link: "#bio", image: aboutMenuImage },
+  { label: "Skills", ariaLabel: "View skills and expertise", link: "#skills", image: skillsMenuImage },
+  { label: "Projects", ariaLabel: "Browse selected projects", link: "#projects", image: projectsMenuImage },
+  { label: "Contact", ariaLabel: "Go to contact section", link: "#contact", image: contactMenuImage },
+];
+
+const socialItems = [
+  { label: "GitHub", link: "https://github.com/AAB-I-XES" },
+  { label: "Email", link: "mailto:rabhadibyajyoti05@gmail.com" },
+];
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,8 +43,6 @@ export default function App() {
       });
     }
   };
-
-  // Scroll to next chronological story section (from Hero to Bio)
   const handleScrollToNext = () => {
     handleScrollToSection("bio");
   };
@@ -49,17 +65,23 @@ export default function App() {
   }, [isLoading, isMenuOpen]);
 
   return (
-    <div
-      className="relative min-h-screen overflow-hidden select-none"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center center",
-      }}
-    >
+    <div className="relative min-h-screen overflow-hidden select-none">
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="animated-gradient-background absolute inset-0" />
+      </div>
+      <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
+        <Beams
+          beamWidth={3.5}
+          beamHeight={18}
+          beamNumber={8}
+          lightColor="#ffffff"
+          beamColor="#000000"
+          backgroundColor="#000000"
+          speed={2}
+          noiseIntensity={1.75}
+          scale={0.2}
+          rotation={18}
+        />
       </div>
 
       {/* 1. Loading Preloader Screen */}
@@ -73,10 +95,21 @@ export default function App() {
         {(isExitingLoader || !isLoading) && (
           <>
             {/* Navigation Header & Fullscreen Menu (positioned at z-50 to be 100% visible and interactive) */}
-            <Header 
-              isMenuOpen={isMenuOpen}
-              setIsMenuOpen={setIsMenuOpen}
-              onNavClick={handleScrollToSection} 
+            <StaggeredMenu
+              position="right"
+              items={navigationItems}
+              socialItems={socialItems}
+              displaySocials
+              displayItemNumbering
+              isFixed
+              closeOnClickAway
+              colors={["#3a3a3a", "#1d1d1d", "#080808"]}
+              menuButtonColor="#ffffff"
+              openMenuButtonColor="#ffffff"
+              accentColor="#d7d7d7"
+              onMenuOpen={() => setIsMenuOpen(true)}
+              onMenuClose={() => setIsMenuOpen(false)}
+              onItemSelect={(item) => handleScrollToSection(item.link.replace(/^#/, ""))}
             />
 
             {/* The Main Webpage Canvas */}
