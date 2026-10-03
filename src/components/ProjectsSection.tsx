@@ -1,32 +1,42 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { Project } from "../types";
-import { 
-  FolderGit2, 
-  Calendar, 
-  Star, 
-  Compass, 
-  Tag, 
-  Hammer, 
-  ChevronRight, 
-  GitFork, 
-  ExternalLink,
-  Code2,
-  RefreshCw
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  GitFork,
+  Github,
+  Star,
 } from "lucide-react";
+import type { Project } from "../types";
+import FlyingPosters from "./FlyingPosters";
 
-// Robust static fallback representing the actual public repositories of AAB-I-XES
-const GITHUB_FALLBACK_PROJECTS: Project[] = [
+type ProjectFilter = "all" | "originals" | "forks";
+
+interface GitHubRepository {
+  name: string;
+  fork: boolean;
+  created_at: string;
+  language: string | null;
+  description: string | null;
+  topics: string[];
+  html_url: string;
+  stargazers_count: number;
+  forks_count: number;
+}
+
+const FALLBACK_PROJECTS: Project[] = [
   {
     id: "harmonic",
     title: "HARMONIC",
-    category: "Kotlin Mobile App",
-    description: "An elegant, performant open source music streaming and audio management application engineered natively in Kotlin.",
-    tags: ["Kotlin", "Android", "Mobile Audio", "Music Streamer", "ExoPlayer"],
+    category: "Kotlin / Android",
+    description: "An open-source music streaming and audio management application built natively with Kotlin.",
+    tags: ["Kotlin", "Android", "Audio", "ExoPlayer"],
     role: "Creator & Maintainer",
     year: "2026",
     color: "pink",
-    accentColor: "#ffd6e0",
+    accentColor: "#ffffff",
     isFeatured: true,
     htmlUrl: "https://github.com/AAB-I-XES/HARMONIC",
     stars: 1,
@@ -36,13 +46,13 @@ const GITHUB_FALLBACK_PROJECTS: Project[] = [
   {
     id: "piannaa",
     title: "piannaa",
-    category: "TypeScript Audio Web",
-    description: "A highly interactive digital piano interface featuring lightweight audio synthesis mechanics and hand-drawn layout visuals.",
-    tags: ["TypeScript", "Web Audio API", "Digital Piano", "Interactive SVG"],
+    category: "TypeScript / Audio",
+    description: "An interactive digital piano interface built with lightweight audio synthesis and a visual-first layout.",
+    tags: ["TypeScript", "Web Audio API", "SVG"],
     role: "Creator & Maintainer",
     year: "2026",
     color: "beige",
-    accentColor: "#E6DFD3",
+    accentColor: "#b8b8b8",
     isFeatured: true,
     htmlUrl: "https://github.com/AAB-I-XES/piannaa",
     stars: 0,
@@ -52,14 +62,13 @@ const GITHUB_FALLBACK_PROJECTS: Project[] = [
   {
     id: "compose-multiplatform",
     title: "compose-multiplatform",
-    category: "Kotlin UI Framework (Fork)",
-    description: "Personal development branch exploring declarative UI capabilities across Android, iOS, Desktop, and Web from the main Jetpack Compose multiplatform repo.",
-    tags: ["Kotlin", "Compose", "Multiplatform", "Declarative UI"],
-    role: "Contributor (Forked)",
+    category: "Kotlin / UI framework",
+    description: "A development fork for exploring declarative UI across Android, iOS, desktop, and web.",
+    tags: ["Kotlin", "Compose", "Multiplatform"],
+    role: "Contributor · Fork",
     year: "2026",
     color: "white",
-    accentColor: "#FFFFFF",
-    isFeatured: false,
+    accentColor: "#b8b8b8",
     htmlUrl: "https://github.com/AAB-I-XES/compose-multiplatform",
     stars: 0,
     forks: 0,
@@ -68,14 +77,13 @@ const GITHUB_FALLBACK_PROJECTS: Project[] = [
   {
     id: "linux",
     title: "linux",
-    category: "C Kernel Source (Fork)",
-    description: "A personal developmental environment mapping low-level systems programming, drivers, and kernel mechanics from the Linux source tree.",
-    tags: ["C", "Linux Kernel", "Low Level Systems", "Memory Layouts"],
-    role: "Contributor (Forked)",
+    category: "C / Systems",
+    description: "A personal development environment for exploring systems programming, drivers, and kernel mechanics.",
+    tags: ["C", "Linux", "Systems"],
+    role: "Contributor · Fork",
     year: "2026",
     color: "dark",
-    accentColor: "#111111",
-    isFeatured: false,
+    accentColor: "#ffffff",
     htmlUrl: "https://github.com/AAB-I-XES/linux",
     stars: 0,
     forks: 0,
@@ -84,499 +92,384 @@ const GITHUB_FALLBACK_PROJECTS: Project[] = [
   {
     id: "nowinandroid",
     title: "nowinandroid",
-    category: "Kotlin Android Spec (Fork)",
-    description: "A comprehensive model showcasing top-tier Android programming practices, dependency injections, and modern Jetpack Compose layouts.",
-    tags: ["Kotlin", "Android Spec", "Clean Architecture", "Hilt"],
-    role: "Contributor (Forked)",
+    category: "Kotlin / Android",
+    description: "A fork of Google's Android sample app for studying modern development practices and Compose UI.",
+    tags: ["Kotlin", "Android", "Compose", "Hilt"],
+    role: "Contributor · Fork",
     year: "2026",
     color: "pink",
-    accentColor: "#ffd6e0",
-    isFeatured: false,
+    accentColor: "#b8b8b8",
     htmlUrl: "https://github.com/AAB-I-XES/nowinandroid",
     stars: 0,
     forks: 0,
     isFork: true,
-  }
+  },
 ];
 
-// Procedural blueprint-style vector schematic graphics matching user projects
-const ProjectSchematic = ({ id }: { id: string }) => {
-  const normId = id.toLowerCase();
-  
-  if (normId.includes("harmonic")) {
-    return (
-      <svg className="w-full h-full text-[#141414]/10 stroke-current" viewBox="0 0 100 100" fill="none">
-        <circle cx="50" cy="50" r="38" strokeWidth="0.5" strokeDasharray="3 3" />
-        <path d="M15 50 Q32.5 15, 50 50 T85 50" strokeWidth="0.8" strokeLinecap="round" />
-        <path d="M15 50 Q32.5 85, 50 50 T85 50" strokeWidth="0.4" strokeDasharray="2 1" strokeLinecap="round" />
-        <circle cx="50" cy="50" r="14" strokeWidth="0.6" />
-        <circle cx="50" cy="50" r="2" fill="currentColor" opacity="0.4" />
-      </svg>
-    );
-  }
-  if (normId.includes("piannaa")) {
-    return (
-      <svg className="w-full h-full text-[#141414]/10 stroke-current" viewBox="0 0 100 100" fill="none">
-        <rect x="15" y="15" width="70" height="70" rx="3" strokeWidth="0.6" />
-        <line x1="26.6" y1="15" x2="26.6" y2="85" strokeWidth="0.4" />
-        <line x1="38.3" y1="15" x2="38.3" y2="85" strokeWidth="0.4" />
-        <line x1="50" y1="15" x2="50" y2="85" strokeWidth="0.4" />
-        <line x1="61.6" y1="15" x2="61.6" y2="85" strokeWidth="0.4" />
-        <line x1="73.3" y1="15" x2="73.3" y2="85" strokeWidth="0.4" />
-        {/* Black keys */}
-        <rect x="23" y="15" width="6" height="42" fill="currentColor" opacity="0.12" />
-        <rect x="35" y="15" width="6" height="42" fill="currentColor" opacity="0.12" />
-        <rect x="58" y="15" width="6" height="42" fill="currentColor" opacity="0.12" />
-        <rect x="70" y="15" width="6" height="42" fill="currentColor" opacity="0.12" />
-      </svg>
-    );
-  }
-  if (normId.includes("compose")) {
-    return (
-      <svg className="w-full h-full text-[#141414]/10 stroke-current" viewBox="0 0 100 100" fill="none">
-        <rect x="22" y="22" width="46" height="46" rx="5" strokeWidth="0.8" />
-        <rect x="32" y="32" width="46" height="46" rx="5" strokeWidth="0.4" strokeDasharray="3 2" />
-        <circle cx="50" cy="50" r="12" strokeWidth="0.5" strokeDasharray="1 1" />
-        <line x1="22" y1="22" x2="78" y2="78" strokeWidth="0.3" />
-      </svg>
-    );
-  }
-  if (normId.includes("linux")) {
-    return (
-      <svg className="w-full h-full text-[#141414]/10 stroke-current" viewBox="0 0 100 100" fill="none">
-        <rect x="15" y="20" width="70" height="60" rx="4" strokeWidth="0.8" />
-        <line x1="15" y1="35" x2="85" y2="35" strokeWidth="0.5" />
-        <path d="M24 45 L30 50 L24 55" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="34" y1="55" x2="48" y2="55" strokeWidth="0.8" strokeLinecap="round" />
-        <circle cx="68" cy="27" r="1.5" strokeWidth="0.5" />
-        <circle cx="74" cy="27" r="1.5" strokeWidth="0.5" />
-        <circle cx="80" cy="27" r="1.5" strokeWidth="0.5" />
-      </svg>
-    );
-  }
-  if (normId.includes("nowinandroid") || normId.includes("android")) {
-    return (
-      <svg className="w-full h-full text-[#141414]/10 stroke-current" viewBox="0 0 100 100" fill="none">
-        <rect x="30" y="15" width="40" height="70" rx="7" strokeWidth="0.8" />
-        <line x1="30" y1="24" x2="70" y2="24" strokeWidth="0.5" />
-        <line x1="30" y1="76" x2="70" y2="76" strokeWidth="0.5" />
-        <circle cx="50" cy="19" r="1.2" fill="currentColor" opacity="0.3" />
-        <circle cx="50" cy="81" r="2.5" strokeWidth="0.5" />
-        <rect x="36" y="30" width="28" height="38" rx="2" strokeWidth="0.4" strokeDasharray="2 2" />
-      </svg>
-    );
-  }
-  // Default vector outline for standard repositories
-  return (
-    <svg className="w-full h-full text-[#141414]/10 stroke-current" viewBox="0 0 100 100" fill="none">
-      <rect x="20" y="20" width="60" height="60" rx="2" strokeWidth="0.5" />
-      <circle cx="50" cy="50" r="22" strokeWidth="0.6" />
-      <line x1="20" y1="50" x2="80" y2="50" strokeWidth="0.4" strokeDasharray="3 3" />
-      <line x1="50" y1="20" x2="50" y2="80" strokeWidth="0.4" strokeDasharray="3 3" />
-    </svg>
-  );
-};
+function isRepository(value: unknown): value is GitHubRepository {
+  if (!value || typeof value !== "object") return false;
+  const repo = value as Record<string, unknown>;
+  return typeof repo.name === "string"
+    && typeof repo.fork === "boolean"
+    && typeof repo.created_at === "string"
+    && (typeof repo.language === "string" || repo.language === null)
+    && (typeof repo.description === "string" || repo.description === null)
+    && typeof repo.html_url === "string"
+    && typeof repo.stargazers_count === "number"
+    && typeof repo.forks_count === "number"
+    && Array.isArray(repo.topics)
+    && repo.topics.every((topic) => typeof topic === "string");
+}
+
+function mapRepository(repo: GitHubRepository, index: number): Project {
+  const isFork = repo.fork;
+  const accentColors = ["#ffffff", "#d0d0d0", "#a0a0a0", "#707070"];
+  const category = repo.language ? `${repo.language} repository` : "Open-source repository";
+
+  return {
+    id: repo.name.toLowerCase(),
+    title: repo.name,
+    category: isFork ? `${category} · Fork` : category,
+    description: repo.description || `Open-source work from the ${repo.name} repository.`,
+    tags: repo.topics.length > 0
+      ? repo.topics
+      : [repo.language || "Software", isFork ? "Fork" : "Original"],
+    role: isFork ? "Contributor · Fork" : "Creator & Maintainer",
+    year: new Date(repo.created_at).getFullYear().toString(),
+    color: ["pink", "beige", "white", "dark"][index % 4] as Project["color"],
+    accentColor: accentColors[index % accentColors.length] ?? "#ffffff",
+    isFeatured: !isFork && repo.stargazers_count > 0,
+    htmlUrl: repo.html_url,
+    stars: repo.stargazers_count,
+    forks: repo.forks_count,
+    isFork,
+  };
+}
+
+function createPosterFallback(project: Project) {
+  const title = project.title.replace(/[<>&"']/g, "");
+  const category = project.category.replace(/[<>&"']/g, "");
+  const color = /^#[\da-f]{6}$/i.test(project.accentColor) ? project.accentColor : "#ffffff";
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="640" height="880" viewBox="0 0 640 880">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#252525"/>
+          <stop offset="1" stop-color="#0b0b0b"/>
+        </linearGradient>
+        <radialGradient id="glow">
+          <stop stop-color="${color}" stop-opacity=".42"/>
+          <stop offset="1" stop-color="${color}" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="640" height="880" fill="url(#bg)"/>
+      <circle cx="490" cy="180" r="290" fill="url(#glow)"/>
+      <path d="M0 560 640 300M0 650 640 390M0 740 640 480" stroke="#fff" stroke-opacity=".12"/>
+      <text x="52" y="88" fill="${color}" font-family="monospace" font-size="18" letter-spacing="5">AAB-I-XES / OPEN SOURCE</text>
+      <text x="52" y="660" fill="#fff" font-family="sans-serif" font-size="54" font-weight="700">${title}</text>
+      <text x="54" y="710" fill="#fff" fill-opacity=".6" font-family="monospace" font-size="20">${category}</text>
+      <text x="54" y="822" fill="#fff" fill-opacity=".45" font-family="monospace" font-size="16">PROJECT ARCHIVE • 2026</text>
+    </svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
 
 export default function ProjectsSection() {
-  const [filter, setFilter] = useState<"all" | "originals" | "forks">("all");
-  const [projects, setProjects] = useState<Project[]>(GITHUB_FALLBACK_PROJECTS);
-  const [activeProject, setActiveProject] = useState<Project | null>(GITHUB_FALLBACK_PROJECTS[0]);
+  const [filter, setFilter] = useState<ProjectFilter>("all");
+  const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS);
+  const [activeProject, setActiveProject] = useState<Project | null>(FALLBACK_PROJECTS[0] ?? null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
 
-  // Fetch repositories dynamically from GitHub API
   useEffect(() => {
-    let active = true;
-    
-    async function fetchGitHubRepos() {
-      setIsLoading(true);
+    let isMounted = true;
+
+    async function loadProjects() {
       try {
-        const response = await fetch("https://api.github.com/users/AAB-I-XES/repos?sort=pushed&per_page=30");
+        const response = await fetch(
+          "https://api.github.com/users/AAB-I-XES/repos?sort=pushed&per_page=30",
+        );
         if (!response.ok) {
-          throw new Error(`GitHub API returned status: ${response.status}`);
+          throw new Error(`GitHub API returned status ${response.status}`);
         }
-        const data = await response.json();
-        
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid GitHub API response payload");
+        const payload: unknown = await response.json();
+        if (!Array.isArray(payload)) {
+          throw new Error("GitHub API returned an invalid repository list");
         }
 
-        // Map GitHub payload to high-fidelity Project type
-        const mappedProjects: Project[] = data
-          .filter((repo: any) => repo.name.toLowerCase() !== "about")
-          .map((repo: any, index: number) => {
-          const isFork = repo.fork;
-          const createdYear = repo.created_at ? new Date(repo.created_at).getFullYear().toString() : "2026";
-          
-          // Generate a deterministic aesthetic layout index for coloring
-          const colorIndex = index % 4;
-          const colors: Array<'pink' | 'beige' | 'white' | 'dark'> = ["pink", "beige", "white", "dark"];
-          const accentColors = ["#ffd6e0", "#E6DFD3", "#FFFFFF", "#111111"];
-          
-          // Structure cleaner descriptive metrics
-          let refinedCategory = repo.language ? `${repo.language} Repository` : "Open Source Repo";
-          if (isFork) refinedCategory += " (Fork)";
-          
-          return {
-            id: repo.name.toLowerCase(),
-            title: repo.name,
-            category: refinedCategory,
-            description: repo.description || `An open-source repository hosting the ${repo.name} codebase. Cultivated and maintained publicly on GitHub.`,
-            tags: repo.topics && repo.topics.length > 0 
-              ? repo.topics 
-              : [repo.language || "Software", isFork ? "Forked" : "Original", "GitHub"],
-            role: isFork ? "Contributor (Forked)" : "Creator & Maintainer",
-            year: createdYear,
-            color: colors[colorIndex],
-            accentColor: accentColors[colorIndex],
-            isFeatured: !isFork && (repo.stargazers_count > 0 || index < 3),
-            htmlUrl: repo.html_url,
-            stars: repo.stargazers_count,
-            forks: repo.forks_count,
-            isFork: isFork,
-          };
-        });
+        const validRepositories = payload.filter(isRepository);
+        if (validRepositories.length !== payload.length) {
+          throw new Error("GitHub API returned an invalid repository entry");
+        }
 
-        if (active) {
-          // Sort to prioritize their original creations first, then forks
-          const sortedProjects = [...mappedProjects].sort((a, b) => {
-            if (a.isFork === b.isFork) {
-              return (b.stars || 0) - (a.stars || 0); // then by stars
-            }
-            return a.isFork ? 1 : -1; // original first
+        const repositories = validRepositories
+          .filter((repo) => repo.name.toLowerCase() !== "about")
+          .map(mapRepository)
+          .sort((left, right) => {
+            if (left.isFork !== right.isFork) return left.isFork ? 1 : -1;
+            return (right.stars ?? 0) - (left.stars ?? 0);
           });
 
-          setProjects(sortedProjects);
-          setActiveProject(sortedProjects[0] || null);
+        if (isMounted) {
+          setProjects(repositories);
+          setActiveProject(repositories[0] ?? null);
+          setActiveIndex(0);
           setIsUsingFallback(false);
         }
-      } catch (err) {
-        console.warn("GitHub dynamic fetch failed, applying rich backup profile: ", err);
-        if (active) {
-          setProjects(GITHUB_FALLBACK_PROJECTS);
-          setActiveProject(GITHUB_FALLBACK_PROJECTS[0]);
+      } catch (error) {
+        console.warn("Unable to load GitHub repositories; showing the cached project list.", error);
+        if (isMounted) {
+          setProjects(FALLBACK_PROJECTS);
+          setActiveProject(FALLBACK_PROJECTS[0] ?? null);
+          setActiveIndex(0);
           setIsUsingFallback(true);
         }
       } finally {
-        if (active) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     }
 
-    fetchGitHubRepos();
+    void loadProjects();
     return () => {
-      active = false;
+      isMounted = false;
     };
   }, []);
 
-  // Filtering repositories based on selection
-  const filteredProjects = projects.filter((proj) => {
-    if (filter === "originals") return !proj.isFork;
-    if (filter === "forks") return proj.isFork;
-    return true;
-  });
+  const filteredProjects = useMemo(
+    () => projects.filter((project) => {
+      if (filter === "originals") return !project.isFork;
+      if (filter === "forks") return project.isFork;
+      return true;
+    }),
+    [filter, projects],
+  );
+  const posterItems = useMemo(
+    () => filteredProjects.map((project) => {
+      const repositoryName = project.htmlUrl?.split("/").pop() || project.title;
+      return `https://opengraph.githubassets.com/1/AAB-I-XES/${encodeURIComponent(repositoryName)}`;
+    }),
+    [filteredProjects],
+  );
+  const posterFallbacks = useMemo(
+    () => filteredProjects.map(createPosterFallback),
+    [filteredProjects],
+  );
+
+  const chooseFilter = (nextFilter: ProjectFilter) => {
+    setFilter(nextFilter);
+    const nextProjects = projects.filter((project) => {
+      if (nextFilter === "originals") return !project.isFork;
+      if (nextFilter === "forks") return project.isFork;
+      return true;
+    });
+    setActiveProject(nextProjects[0] ?? null);
+    setActiveIndex(0);
+  };
+
+  const selectProject = (index: number) => {
+    const project = filteredProjects[index];
+    if (!project) return;
+    setActiveIndex(index);
+    setActiveProject(project);
+  };
+
+  const filters: { id: ProjectFilter; label: string }[] = [
+    { id: "all", label: "Everything" },
+    { id: "originals", label: "Originals" },
+    { id: "forks", label: "Forks" },
+  ];
 
   return (
     <section
       id="projects"
-      className="min-h-screen w-full relative py-20 px-6 md:px-12 bg-[#fcebeb] border-t border-[#141414]/10 overflow-hidden"
+      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#0b0d10] px-6 py-28 text-[#f3f3ee] md:px-12 md:py-32"
     >
-      {/* Background drafting lines */}
-      <div className="absolute inset-0 sketch-grid-dark opacity-10 pointer-events-none" />
-
-      {/* Header Container */}
-      <div className="max-w-7xl mx-auto w-full mb-12 flex flex-col md:flex-row justify-between md:items-center border-b border-[#141414]/10 pb-5 gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-[#141414]/50 font-bold uppercase tracking-wider">
-              04 / GALLERY
-            </span>
-            <span className="font-display font-black text-lg tracking-wider text-[#141414] uppercase">
-              GITHUB ARCHIVES
-            </span>
-          </div>
-          {isUsingFallback && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#141414]/5 text-[#141414]/60 font-mono text-[9px] font-bold border border-[#141414]/10 self-start sm:self-auto uppercase">
-              Offline Spec Cached
-            </span>
-          )}
+      <div className="pointer-events-none absolute -right-44 top-0 h-[34rem] w-[34rem] rounded-full bg-white/[0.045] blur-[140px]" />
+      <div className="relative mx-auto mb-16 flex w-full max-w-7xl flex-col justify-between gap-8 border-b border-white/10 pb-8 md:flex-row md:items-end">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-white">
+            04 / Selected work
+          </span>
+          <h2 className="mt-5 font-display text-4xl tracking-tight sm:text-5xl">
+            Built, learned, shared.
+          </h2>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-white/45">
+            A live window into my public GitHub work — original projects alongside repositories
+            I’m learning from and contributing to.
+          </p>
         </div>
-
-        {/* Dynamic Filter Switcher Controls */}
-        <div className="flex items-center gap-1 bg-[#f5f2ed] p-1 border border-[#141414]/15 rounded-full self-start md:self-auto shadow-xs">
-          <button
-            onClick={() => {
-              setFilter("all");
-              // Safely set first filtered item active
-              const firstFiltered = projects[0];
-              if (firstFiltered) setActiveProject(firstFiltered);
-            }}
-            className={`px-4 py-1.5 rounded-full font-mono text-[10px] sm:text-xs cursor-pointer transition-all ${
-              filter === "all"
-                ? "bg-[#141414] text-[#f5f2ed] font-bold"
-                : "text-[#141414]/60 hover:text-[#141414]"
-            }`}
-          >
-            All Repos ({projects.length})
-          </button>
-          <button
-            onClick={() => {
-              setFilter("originals");
-              const firstFiltered = projects.find(p => !p.isFork);
-              if (firstFiltered) setActiveProject(firstFiltered);
-            }}
-            className={`px-4 py-1.5 rounded-full font-mono text-[10px] sm:text-xs cursor-pointer transition-all ${
-              filter === "originals"
-                ? "bg-[#141414] text-[#f5f2ed] font-bold"
-                : "text-[#141414]/60 hover:text-[#141414]"
-            }`}
-          >
-            Originals ({projects.filter(p => !p.isFork).length})
-          </button>
-          <button
-            onClick={() => {
-              setFilter("forks");
-              const firstFiltered = projects.find(p => p.isFork);
-              if (firstFiltered) setActiveProject(firstFiltered);
-            }}
-            className={`px-4 py-1.5 rounded-full font-mono text-[10px] sm:text-xs cursor-pointer transition-all ${
-              filter === "forks"
-                ? "bg-[#141414] text-[#f5f2ed] font-bold"
-                : "text-[#141414]/60 hover:text-[#141414]"
-            }`}
-          >
-            Forks ({projects.filter(p => p.isFork).length})
-          </button>
+        <div className="flex flex-wrap gap-2">
+          {filters.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => chooseFilter(id)}
+              aria-pressed={filter === id}
+              className={`rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] transition ${
+                filter === id
+                  ? "border-white bg-white text-[#11140c]"
+                  : "border-white/15 text-white/55 hover:border-white/40 hover:text-white"
+              }`}
+            >
+              {label}
+              <span className="ml-2 opacity-60">
+                {id === "all"
+                  ? projects.length
+                  : projects.filter((project) => (id === "forks" ? project.isFork : !project.isFork)).length}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
-        
-        {/* LEFT COLUMN: LIST OF DYNAMIC GITHUB ARCHIVE FOLDERS */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="font-mono text-[9px] tracking-widest text-[#141414]/50 uppercase pb-2 border-b border-[#141414]/5 flex justify-between items-center font-bold">
-            <span>REPOSITORY CATALOG</span>
-            <span>AAB-I-XES PROFILE</span>
-          </div>
-
-          <div className="space-y-3.5 max-h-[580px] overflow-y-auto pr-2 custom-scrollbar">
-            {isLoading ? (
-              /* High-fidelity architectural loading skeletons */
-              [...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="w-full bg-white/45 border-2 border-dashed border-[#141414]/15 rounded-xl p-4 flex justify-between items-center animate-pulse"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg border border-[#141414]/10 bg-[#f5f2ed]/50 flex items-center justify-center shrink-0">
-                      <RefreshCw className="w-4 h-4 text-[#141414]/20 animate-spin" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-4 w-32 bg-[#141414]/10 rounded" />
-                      <div className="h-2 w-20 bg-[#141414]/5 rounded" />
-                    </div>
-                  </div>
-                  <div className="h-4 w-4 bg-[#141414]/10 rounded" />
-                </div>
-              ))
-            ) : filteredProjects.length === 0 ? (
-              <div className="border border-dashed border-[#141414]/20 rounded-xl p-8 text-center bg-white/40 font-mono text-xs text-[#141414]/50">
-                [ No repositories match this category filter ]
-              </div>
-            ) : (
-              filteredProjects.map((proj) => {
-                const isActive = activeProject?.id === proj.id;
-                
-                // Set layout colors dynamically
-                let cardBg = "bg-white";
-                if (isActive) {
-                  cardBg = proj.color === "pink" ? "bg-[#ffd6e0]" : proj.color === "beige" ? "bg-[#E6DFD3]" : "bg-white";
-                }
-
-                return (
-                  <button
-                    key={proj.id}
-                    onClick={() => setActiveProject(proj)}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between group ${
-                      isActive
-                        ? `${cardBg} border-[#141414] shadow-[4px_4px_0px_#141414]`
-                        : "bg-white/85 border-[#141414]/10 hover:border-[#141414]/30 hover:bg-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-4 min-w-0">
-                      <div className="w-10 h-10 rounded-lg border border-[#141414]/15 bg-[#f5f2ed]/60 flex items-center justify-center text-[#141414]/70 group-hover:rotate-6 transition-transform shrink-0">
-                        {proj.isFork ? (
-                          <GitFork className="w-4 h-4 text-[#141414]/65" />
-                        ) : (
-                          <FolderGit2 className="w-4 h-4 text-[#141414]/85" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-display font-black text-sm text-[#141414] tracking-tight truncate max-w-[180px] uppercase">
-                            {proj.title}
-                          </span>
-                          {!proj.isFork && (
-                            <Star className="w-3 h-3 text-[#141414] fill-[#141414] shrink-0" />
-                          )}
-                        </div>
-                        <span className="font-mono text-[9px] tracking-wider text-[#141414]/50 uppercase block line-clamp-1 mt-0.5 font-bold">
-                          {proj.category}
-                        </span>
-                      </div>
-                    </div>
-
-                    <ChevronRight className={`w-4 h-4 text-[#141414]/40 group-hover:translate-x-1 transition-transform shrink-0 ${
-                      isActive ? "rotate-90 text-[#141414]" : ""
-                    }`} />
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: DETAILED BLUEPRINT SPECIFICATION DRAWING BOARD */}
-        <div className="lg:col-span-7">
-          <AnimatePresence mode="wait">
-            {activeProject ? (
+      <div className="relative mx-auto grid w-full max-w-7xl gap-8 overflow-hidden rounded-[2rem] border border-white/10 bg-[#12151b] lg:min-h-[44rem] lg:grid-cols-2">
+        <div className="relative z-10 flex flex-col justify-between p-7 sm:p-12 lg:p-14">
+          {activeProject ? (
+            <AnimatePresence mode="wait">
               <motion.div
                 key={activeProject.id}
-                initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
+                initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -30, filter: "blur(6px)" }}
-                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-white border-2 border-[#141414] rounded-2xl shadow-[6px_6px_0px_#141414] overflow-hidden flex flex-col min-h-[500px]"
+                exit={{ opacity: 0, y: -18, filter: "blur(6px)" }}
+                transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
               >
-                {/* Tech Blueprint Header Bar */}
-                <div className="bg-[#141414] text-[#f5f2ed] px-6 py-4 flex justify-between items-center font-mono text-[10px] tracking-widest uppercase">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span>Blueprint Spec // {activeProject.title}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span>{activeProject.year}</span>
-                  </div>
+                <div className="mb-14 flex items-center justify-between gap-4">
+                  <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
+                    <span className={`h-2 w-2 rounded-full ${isUsingFallback ? "bg-white/45" : "animate-pulse bg-white"}`} />
+                    {isLoading ? "Syncing archive" : isUsingFallback ? "Cached archive" : "Live from GitHub"}
+                  </span>
+                  <span className="font-mono text-xs text-white/35">
+                    {String(activeIndex + 1).padStart(2, "0")} / {String(filteredProjects.length).padStart(2, "0")}
+                  </span>
                 </div>
 
-                <div className="p-6 md:p-8 flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
-                  
-                  {/* Schematic Drawing Frame (Top on mobile, Left in subgrid on desktop) */}
-                  <div className="md:col-span-5 h-48 md:h-64 border border-[#141414]/10 rounded-xl bg-[#f5f2ed]/50 p-4 relative flex items-center justify-center overflow-hidden">
-                    <div className="absolute top-2 left-2.5 font-mono text-[7px] text-[#141414]/30 uppercase font-black">
-                      Vector Schematic
-                    </div>
-                    {/* Render specific procedural SVG blueprint based on project id */}
-                    <ProjectSchematic id={activeProject.id} />
-                  </div>
-
-                  {/* Blueprint Tech Specs Information (Right in subgrid) */}
-                  <div className="md:col-span-7 space-y-6">
-                    <div className="space-y-1">
-                      <span className="font-mono text-[9px] uppercase tracking-wider text-[#141414]/50 flex items-center gap-1.5 font-black">
-                        <Compass className="w-3.5 h-3.5 text-[#141414]/60" />
-                        Repository Core &amp; Scope
-                      </span>
-                      <h3 className="font-display font-black text-2.5xl text-[#141414] tracking-tight uppercase">
-                        {activeProject.title}
-                      </h3>
-                      <p className="font-mono text-[10px] text-[#141414]/55 uppercase tracking-wider font-bold">
-                        {activeProject.category}
-                      </p>
-                    </div>
-
-                    <p className="font-sans text-xs md:text-sm text-[#141414]/80 leading-relaxed font-semibold select-text">
-                      {activeProject.description}
-                    </p>
-
-                    {/* Metadata Table Rows */}
-                    <div className="border-t border-[#141414]/10 pt-4 space-y-2.5 font-mono text-[10px]">
-                      
-                      {/* Year Row */}
-                      <div className="flex justify-between items-center border-b border-[#141414]/5 pb-1.5 text-[#141414]">
-                        <span className="text-[#141414]/50 uppercase flex items-center gap-1.5 font-black">
-                          <Calendar className="w-3.5 h-3.5 text-[#141414]/50" /> Year Initiated
-                        </span>
-                        <span className="font-black">{activeProject.year}</span>
-                      </div>
-
-                      {/* Role Row */}
-                      <div className="flex justify-between items-center border-b border-[#141414]/5 pb-1.5 text-[#141414]">
-                        <span className="text-[#141414]/50 uppercase flex items-center gap-1.5 font-black">
-                          <Hammer className="w-3.5 h-3.5 text-[#141414]/50" /> Profile Role
-                        </span>
-                        <span className="font-black text-right max-w-[150px] sm:max-w-none truncate">
-                          {activeProject.role}
-                        </span>
-                      </div>
-
-                      {/* GitHub Stars & Forks Metrics Row */}
-                      <div className="flex justify-between items-center border-b border-[#141414]/5 pb-1.5 text-[#141414]">
-                        <span className="text-[#141414]/50 uppercase flex items-center gap-1.5 font-black">
-                          <Code2 className="w-3.5 h-3.5 text-[#141414]/50" /> Social Engagement
-                        </span>
-                        <span className="font-black flex items-center gap-3">
-                          <span className="flex items-center gap-1">
-                            <Star className="w-3 h-3 text-[#141414]" /> {activeProject.stars ?? 0} Stars
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <GitFork className="w-3 h-3 text-[#141414]" /> {activeProject.forks ?? 0} Forks
-                          </span>
-                        </span>
-                      </div>
-
-                      {/* Tech Stack Elements */}
-                      <div className="flex flex-col gap-1.5 pt-1 text-[#141414]">
-                        <span className="text-[#141414]/50 uppercase flex items-center gap-1.5 font-black">
-                          <Tag className="w-3.5 h-3.5 text-[#141414]/50" /> Stack Components
-                        </span>
-                        <div className="flex flex-wrap gap-1.5 mt-1">
-                          {activeProject.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="px-2 py-0.5 rounded-sm border border-[#141414]/15 bg-[#f5f2ed] text-[#141414]/85 text-[9px] font-black uppercase"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* External Link Action Button */}
-                    {activeProject.htmlUrl && (
-                      <div className="pt-4 border-t border-[#141414]/5">
-                        <a
-                          href={activeProject.htmlUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[#141414] bg-white text-[#141414] hover:bg-[#141414] hover:text-[#f5f2ed] shadow-[3px_3px_0px_#141414] hover:shadow-[1px_1px_0px_#141414] hover:translate-x-[2px] hover:translate-y-[2px] font-mono text-[10px] font-black uppercase tracking-wider transition-all w-full md:w-auto"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Inspect on GitHub</span>
-                        </a>
-                      </div>
-                    )}
-
-                  </div>
-
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white">
+                  {activeProject.isFork ? "Open source / Fork" : "Open source / Original"}
+                </span>
+                <h3 className="mt-7 break-words font-display text-4xl leading-[0.95] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  {activeProject.title}
+                </h3>
+                <p className="mt-5 font-mono text-xs uppercase tracking-[0.12em] text-white/40">
+                  {activeProject.category} <span className="px-1 text-white/20">/</span> {activeProject.year}
+                </p>
+                <p className="mt-10 max-w-lg text-sm leading-8 text-white/60 sm:text-base">
+                  {activeProject.description}
+                </p>
+                <div className="mt-8 flex flex-wrap gap-2.5">
+                  {activeProject.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 font-mono text-[10px] text-white/55"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </motion.div>
-            ) : (
-              <div className="h-full border-2 border-dashed border-[#141414]/25 rounded-2xl flex items-center justify-center p-8 bg-white/40 min-h-[500px]">
-                <span className="font-mono text-xs text-[#141414]/40 tracking-widest uppercase">
-                  [ Choose an archive entry to load blueprints ]
+            </AnimatePresence>
+          ) : (
+            <div className="grid min-h-72 place-items-center text-center text-sm text-white/45">
+              {isLoading ? "Loading projects…" : "No projects available for this filter."}
+            </div>
+          )}
+
+          <div className="mt-14 border-t border-white/10 pt-6">
+            <div className="mb-7 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4 font-mono text-xs text-white/45">
+                <span className="flex items-center gap-1.5">
+                  <Star className="h-4 w-4 text-white" />
+                  {activeProject?.stars ?? 0}
                 </span>
+                <span className="flex items-center gap-1.5">
+                  <GitFork className="h-4 w-4 text-white/60" />
+                  {activeProject?.forks ?? 0}
+                </span>
+                <span>{activeProject?.role}</span>
               </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  aria-label="Previous project"
+                  disabled={filteredProjects.length < 2}
+                  onClick={() => selectProject((activeIndex - 1 + filteredProjects.length) % filteredProjects.length)}
+                  className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-white transition hover:border-white hover:bg-white hover:text-black disabled:opacity-30"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next project"
+                  disabled={filteredProjects.length < 2}
+                  onClick={() => selectProject((activeIndex + 1) % filteredProjects.length)}
+                  className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-white transition hover:border-white hover:bg-white hover:text-black disabled:opacity-30"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            {activeProject?.htmlUrl && (
+              <a
+                href={activeProject.htmlUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-semibold text-[#11140c] transition hover:bg-white/80"
+              >
+                <Github className="h-4 w-4" />
+                Explore repository
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
             )}
-          </AnimatePresence>
+          </div>
         </div>
 
+        <div className="relative min-h-[34rem] overflow-hidden bg-[radial-gradient(ellipse_at_50%_45%,rgba(255,255,255,0.09),transparent_55%)] lg:min-h-[44rem]">
+          <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-[#12151b] via-transparent to-transparent lg:w-1/3" />
+          <div className="absolute inset-0 px-3 sm:px-8">
+            {posterItems.length > 0 && (
+              <FlyingPosters
+                items={posterItems}
+                fallbacks={posterFallbacks}
+                activeIndex={activeIndex}
+                onActiveIndexChange={selectProject}
+                planeWidth={360}
+                planeHeight={430}
+                gap={64}
+                distortion={2.2}
+                scrollEase={0.08}
+                cameraFov={42}
+                cameraZ={22}
+              />
+            )}
+          </div>
+          <div className="pointer-events-none absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-white/45">
+            <ArrowDown className="h-3.5 w-3.5 text-white" />
+            Scroll here to explore
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-8 grid w-full max-w-7xl grid-cols-2 gap-3 sm:grid-cols-3 lg:mt-10 lg:grid-cols-5 lg:gap-4">
+        {filteredProjects.map((project, index) => (
+          <button
+            key={project.id}
+            type="button"
+            onClick={() => selectProject(index)}
+            aria-pressed={index === activeIndex}
+            className={`group flex min-w-0 items-center justify-between gap-2 rounded-xl border px-3 py-3 text-left transition sm:px-4 ${
+              index === activeIndex
+                ? "border-white/40 bg-white/[0.08]"
+                : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
+            }`}
+          >
+            <span className="min-w-0">
+              <span className="block truncate font-mono text-[9px] text-white/35">0{index + 1}</span>
+              <span className={`mt-1 block truncate text-xs ${index === activeIndex ? "text-white" : "text-white/55 group-hover:text-white"}`}>
+                {project.title}
+              </span>
+            </span>
+            <ArrowUpRight className={`h-3.5 w-3.5 shrink-0 ${index === activeIndex ? "text-white" : "text-white/20"}`} />
+          </button>
+        ))}
       </div>
     </section>
   );

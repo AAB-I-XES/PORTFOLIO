@@ -1,0 +1,48 @@
+.flying-posters {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 32rem;
+  overflow: hidden;
+  isolation: isolate;
+  touch-action: pan-y;
+  cursor: grab;
+}
+
+.flying-posters:active {
+  cursor: grabbing;
+}
+
+.flying-posters__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.flying-posters__canvas.is-unavailable {
+  display: none;
+}
+
+.flying-posters__fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.flying-posters__fallback img {
+  position: absolute;
+  width: min(68%, 19rem);
+  height: 24rem;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 1.25rem;
+  object-fit: cover;
+  transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 450ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flying-posters__fallback img {
+    transition: none;
+  }
+}

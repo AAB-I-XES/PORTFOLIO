@@ -54,7 +54,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
     <section
       id="hero"
       onMouseMove={handleMouseMove}
-      className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 overflow-hidden select-none bg-[#f5f2ed]"
+      className="min-h-screen w-full relative flex flex-col justify-between items-center p-6 md:p-12 overflow-hidden select-none bg-[#ededed]"
     >
       <div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
         <div className="animated-gradient-background absolute inset-0" />
@@ -62,7 +62,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           beamWidth={3.5}
           beamHeight={18}
           beamNumber={8}
-          lightColor="#ffd6e0"
+          lightColor="#ffffff"
           beamColor="#141414"
           backgroundColor={null}
           speed={2}
@@ -71,7 +71,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           rotation={18}
         />
       </div>
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.12),_transparent_55%)]" />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.18),_transparent_55%)]" />
 
       {/* 1. ARCHITECTURAL DRAFTING PAPER BACKGROUND EFFECT */}
       <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.25]">
@@ -121,7 +121,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
           <button
             type="button"
             onClick={handleContactClick}
-            className="inline-flex items-center gap-2 rounded-full border border-[#141414]/10 bg-white/80 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.35em] text-[#141414] shadow-sm transition hover:bg-[#f5f2ed]"
+            className="inline-flex items-center gap-2 rounded-full border border-[#141414]/10 bg-white/80 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.35em] text-[#141414] shadow-sm transition hover:bg-white"
           >
             Contact for Info
           </button>
@@ -150,7 +150,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
 
           {/* The main typographic title */}
           <div className="relative flex flex-col items-center justify-center">
-            <h1 className="font-display font-normal text-5xl sm:text-7xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-[0.05em] uppercase select-none text-[#e7d8c7] drop-shadow-[0_2px_10px_rgba(20,20,20,0.45)]">
+            <h1 className="font-display font-normal text-5xl sm:text-7xl md:text-[7rem] lg:text-[8.5rem] leading-[0.85] tracking-[0.05em] uppercase select-none text-[#1b1b1b] drop-shadow-[0_2px_10px_rgba(20,20,20,0.25)]">
               <motion.span
                 initial={{ opacity: 0, y: 50, filter: "blur(12px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -188,7 +188,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
               ))}
             </div>
             
-            <div className="absolute bg-[#f5f2ed] px-4 font-mono text-[9px] uppercase tracking-widest text-[#141414]/40" />
+            <div className="absolute bg-[#ededed] px-4 font-mono text-[9px] uppercase tracking-widest text-[#141414]/40" />
           </div>
 
           {/* Subtitle / Tagline */}
@@ -235,7 +235,7 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
         <div className="hidden md:flex flex-col items-end font-mono text-[9px] tracking-widest text-[#141414]/45 uppercase text-right gap-1">
           <div className="flex items-center gap-2">
             <span>Guwahati Time</span>
-            <span className="px-1.5 py-0.5 bg-[#141414] text-[#f5f2ed] rounded font-semibold text-[8px]">
+            <span className="px-1.5 py-0.5 bg-[#141414] text-white rounded font-semibold text-[8px]">
               {localTime || "00:00:00"}
             </span>
           </div>

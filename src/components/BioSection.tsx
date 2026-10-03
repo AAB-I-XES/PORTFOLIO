@@ -1,60 +1,60 @@
-import React, { useRef, useState } from "react";
-import { motion, useScroll, useTransform, useSpring } from "motion/react";
-import { PenTool } from "lucide-react";
+import { useRef, useState } from "react";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import { ArrowLeft, ArrowRight, MoveUpRight } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
+import SpotlightCard from "./SpotlightCard";
 import ovcharBg from "../../assets/ovchar.png";
 import pic3 from "../../assets/pic3.jpg";
 
-const HERO_CHARACTER_PHOTO = ovcharBg;
-const GITHUB_PROFILE_PHOTO = "https://github.com/AAB-I-XES.png";
-const LINKEDIN_PROFILE_PHOTO = pic3;
-
 const PROFILE_CARDS = [
   {
-    id: "hero-character",
+    id: "character",
     title: "Character",
-    subtitle: "Visual Identity",
-    image: HERO_CHARACTER_PHOTO,
+    subtitle: "Visual identity",
+    image: ovcharBg,
   },
   {
     id: "github",
     title: "GitHub",
-    subtitle: "Code Archive",
-    image: GITHUB_PROFILE_PHOTO,
+    subtitle: "Code archive",
+    image: "https://github.com/AAB-I-XES.png",
   },
   {
     id: "linkedin",
     title: "LinkedIn",
-    subtitle: "Professional Pulse",
-    image: LINKEDIN_PROFILE_PHOTO,
+    subtitle: "Professional profile",
+    image: pic3,
   },
   {
     id: "portfolio",
     title: "Featured",
-    subtitle: "Nothing to view",
+    subtitle: "Selected work",
     image: null,
   },
   {
     id: "studio",
     title: "Archive",
-    subtitle: "Nothing to view",
+    subtitle: "Work in progress",
     image: null,
   },
 ];
 
 export default function BioSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
   const [activeCardIdx, setActiveCardIdx] = useState(2);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "end start"]
+    offset: ["start end", "end start"],
+  });
+  const imageY = useSpring(useTransform(scrollYProgress, [0, 1], [28, -28]), {
+    stiffness: 100,
+    damping: 24,
   });
 
-  const goToCard = (index: number) => setActiveCardIdx(index);
   const moveCard = (direction: 1 | -1) => {
-    setActiveCardIdx((prev) => (prev + direction + PROFILE_CARDS.length) % PROFILE_CARDS.length);
+    setActiveCardIdx((current) => (current + direction + PROFILE_CARDS.length) % PROFILE_CARDS.length);
   };
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
@@ -63,170 +63,145 @@ export default function BioSection() {
 
   const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
     if (touchStartX.current === null) return;
-
-    const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX.current;
-    const deltaX = touchEndX - touchStartX.current;
-
-    if (Math.abs(deltaX) > 50) {
-      moveCard(deltaX < 0 ? 1 : -1);
-    }
-
+    const endX = event.changedTouches[0]?.clientX ?? touchStartX.current;
+    const difference = endX - touchStartX.current;
+    if (Math.abs(difference) > 50) moveCard(difference < 0 ? 1 : -1);
     touchStartX.current = null;
   };
-
-  const bioY = useTransform(scrollYProgress, [0, 0.5, 1], [40, 0, -40]);
-  const smoothBioY = useSpring(bioY, { stiffness: 100, damping: 20 });
-
-  const fullBioText = `${BIO_SUMMARY.intro} ${BIO_SUMMARY.detailedBio}`;
-  const words = fullBioText.split(" ");
-  const wordCount = words.length;
 
   return (
     <section
       id="bio"
       ref={containerRef}
-      className="min-h-screen w-full relative flex flex-col justify-center py-20 px-6 md:px-12 bg-[#fcebeb] border-t border-[#141414]/10 overflow-hidden"
+      className="relative isolate flex min-h-screen w-full flex-col justify-center overflow-hidden border-t border-white/10 bg-[#0b0d10] px-6 py-28 text-[#f3f3ee] md:px-12 md:py-32"
     >
-      <div className="absolute inset-0 sketch-grid-dark opacity-40 pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto w-full mb-12 flex justify-between items-center border-b border-[#141414]/10 pb-4 relative z-10">
+      <div className="pointer-events-none absolute -right-40 top-12 h-96 w-96 rounded-full bg-white/[0.06] blur-[120px]" />
+      <div className="mx-auto mb-16 flex w-full max-w-7xl items-center justify-between border-b border-white/10 pb-6">
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xs text-[#141414]/50 font-bold uppercase tracking-wider">
-            02 / BIOGRAPHY
+          <span className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-white">
+            02 / About
           </span>
-          <span className="font-display font-black text-lg tracking-wider text-[#141414] uppercase">
-            Story &amp; Creative Mindset
-          </span>
+          <span className="hidden text-sm text-white/35 sm:inline">A little context</span>
         </div>
-        <span className="font-mono text-[10px] tracking-widest text-[#141414]/50 uppercase hidden sm:inline">
-          [ SCROLL PROGRESS ]
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
+          Guwahati, India
         </span>
       </div>
 
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-20">
         <motion.div
-          style={{ y: smoothBioY }}
-          className="lg:col-span-7 space-y-8"
+          style={{ y: imageY }}
+          className="relative order-2 lg:order-1 lg:col-span-5"
         >
-          <div className="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-[#141414]/60 uppercase">
-            <PenTool className="w-4 h-4 text-[#141414]/70" />
-            <span>Background</span>
-          </div>
-
-          <h2 className="font-display font-black text-3xl md:text-5xl tracking-tight text-[#141414] leading-tight uppercase">
-            Drafting interfaces with <span className="font-serif italic font-normal text-stroke-black">artistic intent</span>
-          </h2>
-
-          <div className="text-[#141414]/30 font-sans text-base md:text-xl md:leading-relaxed font-semibold tracking-wide select-text">
-            {words.map((word, index) => {
-              const startRange = 0.12 + (index / wordCount) * 0.45;
-              const endRange = startRange + 0.05;
-
-              const wordOpacity = useTransform(scrollYProgress, [startRange, endRange], [0.15, 1.0]);
-              const wordColor = useTransform(scrollYProgress, [startRange, endRange], ["#14141430", "#141414"]);
-
+          <div
+            className="relative mx-auto h-[26rem] w-full max-w-sm touch-pan-y sm:h-[34rem]"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {PROFILE_CARDS.map((card, index) => {
+              const offset = index - activeCardIdx;
+              const distance = Math.abs(offset);
+              const isActive = index === activeCardIdx;
               return (
-                <motion.span
-                  key={index}
-                  style={{ opacity: wordOpacity, color: wordColor }}
-                  className="inline-block mr-1.5 transition-colors duration-100"
+                <motion.button
+                  key={card.id}
+                  type="button"
+                  aria-label={`Show ${card.title} profile card`}
+                  aria-pressed={isActive}
+                  onClick={() => setActiveCardIdx(index)}
+                  animate={{
+                    x: offset * 48,
+                    y: distance * 11,
+                    scale: isActive ? 1 : Math.max(0.72, 1 - distance * 0.09),
+                    opacity: isActive ? 1 : Math.max(0.22, 0.7 - distance * 0.12),
+                    rotate: offset * 4,
+                  }}
+                  transition={{ type: "spring", stiffness: 220, damping: 24 }}
+                  className="absolute left-1/2 top-1/2 h-[22rem] w-[15rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#171a20] text-left shadow-[0_30px_90px_rgba(0,0,0,0.45)] sm:h-[27rem] sm:w-[18rem]"
+                  style={{ zIndex: 10 - distance }}
                 >
-                  {word}
-                </motion.span>
+                  {card.image ? (
+                    <img
+                      src={card.image}
+                      alt={card.title === "Character" ? "Illustrated character artwork" : `${card.title} profile`}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_25%_20%,rgba(255,255,255,0.18),transparent_40%),linear-gradient(145deg,#252525,#101010)]">
+                      <span className="font-mono text-xs uppercase tracking-[0.2em] text-white/50">
+                        {card.subtitle}
+                      </span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-black/10" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
+                    <div>
+                      <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.2em] text-white">
+                        Profile / 0{index + 1}
+                      </span>
+                      <span className="font-display text-2xl text-white">{card.title}</span>
+                    </div>
+                    <MoveUpRight className="mb-1 h-5 w-5 text-white/70" aria-hidden="true" />
+                  </div>
+                </motion.button>
               );
             })}
           </div>
 
-          <div className="pt-4 flex flex-wrap gap-3">
-            <span className="font-mono text-xs px-3 py-1.5 rounded-full border border-[#141414]/15 bg-white/50 text-[#141414]/85">
-              #CreativeIllustration
+          <div className="mx-auto flex max-w-sm items-center justify-between border-t border-white/10 pt-4">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
+              Profile carousel
             </span>
-            <span className="font-mono text-xs px-3 py-1.5 rounded-full border border-[#141414]/15 bg-white/50 text-[#141414]/85">
-              #AndroidDevelopment
-            </span>
-            <span className="font-mono text-xs px-3 py-1.5 rounded-full border border-[#141414]/15 bg-white/50 text-[#141414]/85">
-              #FunctionalArt
-            </span>
-          </div>
-        </motion.div>
-
-        <div className="lg:col-span-5 flex flex-col gap-4">
-          <div className="relative flex flex-col">
-            <div className="flex items-center justify-between pb-3 mb-3">
-              <div className="font-mono text-xs uppercase font-bold text-[#141414]">
-                Profile Snapshot
-              </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => moveCard(-1)}
+                aria-label="Previous profile card"
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-white transition hover:border-white hover:bg-white hover:text-black"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
               <button
                 type="button"
                 onClick={() => moveCard(1)}
-                className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#141414] border border-[#141414]/15 bg-white/70 px-3 py-1.5 rounded-full transition hover:bg-[#ffd6e0]"
+                aria-label="Next profile card"
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-white transition hover:border-white hover:bg-white hover:text-black"
               >
-                Switch
+                <ArrowRight className="h-4 w-4" />
               </button>
             </div>
-
-            <div
-              className="relative h-[20rem] sm:h-[26rem] md:h-[32rem] w-full overflow-visible touch-pan-y"
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-            >
-              {PROFILE_CARDS.map((card, idx) => {
-                const offset = idx - activeCardIdx;
-                const distance = Math.abs(offset);
-                const isActive = idx === activeCardIdx;
-
-                return (
-                  <motion.button
-                    key={card.id}
-                    type="button"
-                    onClick={() => goToCard(idx)}
-                    animate={{
-                      x: offset * 84,
-                      scale: isActive ? 1.08 : Math.max(0.68, 1 - distance * 0.12),
-                      y: isActive ? 0 : distance * 16,
-                      opacity: isActive ? 1 : 0.72 - distance * 0.12,
-                      filter: isActive ? "blur(0px)" : "blur(0.4px)",
-                    }}
-                    transition={{ type: "spring", stiffness: 260, damping: 24 }}
-                    className="absolute top-1/2 left-1/2 h-[15rem] sm:h-[20rem] md:h-[24rem] w-[10.5rem] sm:w-[14rem] md:w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] bg-[#f5f2ed] shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
-                    style={{ zIndex: 20 - distance }}
-                  >
-                    {card.image ? (
-                      <>
-                        <div className="h-full w-full border-[10px] border-[#f5f2ed] bg-[#f5f2ed]">
-                          <img
-                            src={card.image}
-                            alt={card.title}
-                            className="h-full w-full object-cover object-center"
-                          />
-                        </div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-white/10" />
-                      </>
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,_#fff6f8,_#f5f2ed_50%,_#e6dfd3)] p-6 text-center">
-                        <div className="font-mono text-[9px] uppercase tracking-[0.28em] text-[#141414]/55">
-                          {card.subtitle}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-full bg-[#141414]/55 px-3 py-1.5 text-[9px] font-mono uppercase tracking-[0.28em] text-white/90 backdrop-blur-sm">
-                      <span>Profile</span>
-                      <span>{isActive ? "Focus" : "View"}</span>
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
           </div>
+        </motion.div>
 
-          <div className="text-[10px] font-mono tracking-widest text-[#141414]/50 uppercase flex justify-between px-2">
-            <span>PROFILE FRAME</span>
-            <span>PHOTO PRESENTATION</span>
+        <div className="order-1 space-y-10 lg:order-2 lg:col-span-7">
+          <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.22em] text-white/45">
+            <span className="h-px w-8 bg-white" />
+            Engineering meets expression
+          </div>
+          <h2 className="max-w-3xl font-display text-4xl leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl">
+            I build useful things with{" "}
+            <span className="text-white">a human point of view.</span>
+          </h2>
+          <SpotlightCard className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 sm:p-8">
+            <p className="relative z-10 text-base leading-8 text-white/65 sm:text-lg">
+              {BIO_SUMMARY.intro}
+            </p>
+            <p className="relative z-10 mt-5 text-base leading-8 text-white/65 sm:text-lg">
+              {BIO_SUMMARY.detailedBio}
+            </p>
+          </SpotlightCard>
+          <div className="flex flex-wrap gap-2">
+            {["Illustration", "Android", "Creative code", "Product thinking"].map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white/60"
+              >
+                {item}
+              </span>
+            ))}
           </div>
         </div>
       </div>
-
     </section>
   );
 }

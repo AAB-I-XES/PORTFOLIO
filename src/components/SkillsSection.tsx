@@ -1,8 +1,22 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { SKILLS_CATEGORIES } from "../data";
-import { SkillCategory } from "../types";
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
+  Award,
+  Atom,
+  Code2,
+  Cpu,
+  FileCode,
+  Layers,
+  Palette,
+  Smartphone,
+  SmartphoneCharging,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
+import { SKILLS_CATEGORIES } from "../data";
+import SpotlightCard from "./SpotlightCard";
+
+const ICONS: Record<string, LucideIcon> = {
   Palette,
   FileCode,
   Code2,
@@ -11,201 +25,158 @@ import {
   Layers,
   SmartphoneCharging,
   Cpu,
-  Sparkles,
-  Award
-} from "lucide-react";
-
-// Helper map to dynamically resolve the required lucide icon
-const IconMap: { [key: string]: any } = {
-  Palette,
-  FileCode,
-  Code2,
-  Atom,
-  Smartphone,
-  Layers,
-  SmartphoneCharging,
-  Cpu
 };
 
 export default function SkillsSection() {
   const [activeCategoryIdx, setActiveCategoryIdx] = useState(0);
   const [selectedSkillName, setSelectedSkillName] = useState<string | null>(null);
+  const activeCategory = SKILLS_CATEGORIES[activeCategoryIdx] ?? SKILLS_CATEGORIES[0];
 
-  const activeCategory = SKILLS_CATEGORIES[activeCategoryIdx];
+  if (!activeCategory) return null;
 
   return (
     <section
       id="skills"
-      className="min-h-screen w-full relative py-20 px-6 md:px-12 bg-[#f5f2ed] border-t border-[#141414]/10 overflow-hidden"
+      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#101318] px-6 py-28 text-[#f3f3ee] md:px-12 md:py-32"
     >
-      {/* Background Grid Pattern */}
-      <div className="absolute inset-0 sketch-grid-dark opacity-10 pointer-events-none" />
-
-      {/* Title block */}
-      <div className="max-w-7xl mx-auto w-full mb-12 flex justify-between items-center border-b border-[#141414]/10 pb-4">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-xs text-[#141414]/50 font-bold uppercase tracking-wider">
-            03 / EXPERTISE
+      <div className="pointer-events-none absolute -left-48 top-1/3 h-[30rem] w-[30rem] rounded-full bg-white/[0.055] blur-[130px]" />
+      <div className="mx-auto mb-16 flex w-full max-w-7xl items-end justify-between border-b border-white/10 pb-6">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-white">
+            03 / Capabilities
           </span>
-          <span className="font-display font-black text-lg tracking-wider text-[#141414] uppercase">
-            SKILLS &amp; DISCIPLINE
-          </span>
+          <h2 className="mt-4 max-w-2xl font-display text-4xl tracking-tight sm:text-5xl">
+            A toolkit for ideas that move.
+          </h2>
         </div>
-        <span className="font-mono text-[10px] tracking-widest text-[#141414]/50 uppercase hidden sm:inline">
-          [ CORE MEDIUMS ]
+        <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-white/35 md:block">
+          Skills &amp; practice
         </span>
       </div>
 
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12">
-        
-        {/* LEFT INDEX PANEL: CATEGORIES (Ruler Style Side Index) */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs font-mono tracking-widest text-[#141414]/60 uppercase">
-              <Award className="w-4 h-4" />
-              <span>Skill Categories</span>
-            </div>
-            <h2 className="font-display font-black text-3xl md:text-4xl tracking-tight text-[#141414] leading-tight uppercase">
-              A balanced, dual-core skill architecture
-            </h2>
-            <p className="font-sans text-[#141414]/75 text-sm leading-relaxed font-semibold">
-              My technical expertise bridges heavy low-level algorithms with highly responsive pixel layout rendering and visual sketching.
-            </p>
+      <div className="relative mx-auto grid w-full max-w-7xl gap-14 lg:grid-cols-12 lg:gap-20">
+        <div className="space-y-9 lg:col-span-4">
+          <div className="flex items-center gap-3 text-sm text-white/50">
+            <Award className="h-4 w-4 text-white" aria-hidden="true" />
+            <span>Choose a discipline</span>
           </div>
+          <p className="max-w-md text-sm leading-7 text-white/50">
+            From interface craft to native development and systems fundamentals, explore the
+            disciplines behind my work.
+          </p>
 
-          {/* Category List buttons with custom tick animations */}
-          <div className="flex flex-col gap-3 pt-6">
-            {SKILLS_CATEGORIES.map((cat, idx) => {
-              const isActive = idx === activeCategoryIdx;
+          <div className="grid gap-3">
+            {SKILLS_CATEGORIES.map((category, index) => {
+              const isActive = index === activeCategoryIdx;
               return (
                 <button
-                  key={cat.title}
+                  key={category.title}
+                  type="button"
                   onClick={() => {
-                    setActiveCategoryIdx(idx);
+                    setActiveCategoryIdx(index);
                     setSelectedSkillName(null);
                   }}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all cursor-pointer relative group ${
+                  aria-pressed={isActive}
+                  className={`group relative w-full overflow-hidden rounded-xl border p-4 text-left transition-colors ${
                     isActive
-                      ? "bg-white border-[#141414] shadow-[4px_4px_0px_#141414]"
-                      : "bg-[#f5f2ed]/50 border-[#141414]/10 hover:border-[#141414]/35 hover:bg-white/40"
+                      ? "border-white/40 bg-white/[0.08]"
+                      : "border-white/10 bg-white/[0.025] hover:border-white/25"
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] tracking-wider text-[#141414]/50">
-                      CATEGORY 0{idx + 1}
-                    </span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="active-tick"
-                        className="w-1.5 h-1.5 rounded-full bg-[#141414]"
-                        transition={{ type: "spring", stiffness: 120, damping: 22 }}
-                      />
-                    )}
-                  </div>
-                  <h3 className="font-display font-black text-base tracking-tight text-[#141414] mt-1 group-hover:text-[#141414]/80 uppercase">
-                    {cat.title}
-                  </h3>
+                  <span className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">
+                    Discipline 0{index + 1}
+                    <span className={`h-2 w-2 rounded-full ${isActive ? "bg-white" : "bg-white/15"}`} />
+                  </span>
+                  <span className="mt-3 block text-sm font-medium text-white">
+                    {category.title}
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* RIGHT DETAILS PANEL: SKILLS DISPLAY (Interactive Drafting Metric) */}
-        <div className="lg:col-span-8 flex flex-col justify-between">
-          
-          {/* Header of Active Category */}
-          <div className="bg-[#fcebeb] border-2 border-[#141414] p-6 rounded-2xl mb-8 relative shadow-sm">
-            <h3 className="font-display font-black text-xl text-[#141414] tracking-tight uppercase">
-              {activeCategory.title}
-            </h3>
-            <p className="font-sans text-xs text-[#141414]/75 leading-relaxed mt-2 font-semibold">
-              {activeCategory.description}
-            </p>
-          </div>
-
-          {/* List of Skills styled as technical drafting scale lines */}
-          <div className="space-y-6">
-            {activeCategory.skills.map((skill) => {
-              const IconComp = IconMap[skill.iconName] || Code2;
-              const isSelected = selectedSkillName === skill.name;
-
-              return (
-                <div
-                  key={skill.name}
-                  onClick={() => setSelectedSkillName(isSelected ? null : skill.name)}
-                  className={`bg-white rounded-xl border-2 transition-all p-5 cursor-pointer relative group ${
-                    isSelected
-                      ? "border-[#141414] shadow-[4px_4px_0px_#141414]"
-                      : "border-[#141414]/10 hover:border-[#141414]/30 hover:shadow-xs"
-                  }`}
-                >
-                  {/* Skill main row */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-[#f5f2ed] flex items-center justify-center text-[#141414]/85 border border-[#141414]/10 group-hover:scale-105 transition-transform">
-                        <IconComp className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-display font-black text-base text-[#141414] tracking-tight uppercase">
-                          {skill.name}
-                        </h4>
-                        <span className="font-mono text-[9px] tracking-wider text-[#141414]/40 uppercase">
-                          LEVEL: {skill.level}/5 &bull; CLICK TO INSPECT
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Minimalist proficiency bar */}
-                    <div className="flex-1 max-w-xs flex flex-col gap-1.5">
-                      <div className="flex justify-between items-center font-mono text-[9px] text-[#141414]/50">
-                        <span>PROFICIENCY</span>
-                        <span>LEVEL {skill.level}/5</span>
-                      </div>
-                      
-                      {/* The scale ruler track */}
-                      <div className="h-2 bg-[#141414]/10 rounded-full relative overflow-hidden">
-                        {/* Animated progress bar overlay */}
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${skill.level * 20}%` }}
-                          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-                          className="h-full bg-[#141414] rounded-full"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Expandable technical details box */}
-                  <AnimatePresence>
-                    {isSelected && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } }}
-                        exit={{ height: 0, opacity: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }}
-                        className="overflow-hidden"
+        <div className="lg:col-span-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCategory.title}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.28 }}
+            >
+              <div className="mb-8 border-l-2 border-white pl-5">
+                <h3 className="font-display text-2xl text-white">{activeCategory.title}</h3>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/50">
+                  {activeCategory.description}
+                </p>
+              </div>
+              <div className="grid gap-3">
+                {activeCategory.skills.map((skill, index) => {
+                  const Icon = ICONS[skill.iconName] ?? Code2;
+                  const isExpanded = selectedSkillName === skill.name;
+                  return (
+                    <SpotlightCard
+                      key={skill.name}
+                      className={`rounded-xl border bg-[#171a20] p-5 transition-colors ${
+                        isExpanded ? "border-white/40" : "border-white/[0.08]"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSkillName(isExpanded ? null : skill.name)}
+                        aria-expanded={isExpanded}
+                        className="relative z-10 flex w-full flex-col gap-5 text-left sm:flex-row sm:items-center sm:justify-between"
                       >
-                        <div className="mt-4 pt-4 border-t border-dashed border-[#141414]/10 bg-[#f5f2ed]/50 p-3 rounded-lg font-sans text-xs text-[#141414]/80 leading-relaxed flex items-start gap-2.5">
-                          <Sparkles className="w-4 h-4 text-[#141414] shrink-0 mt-0.5" />
-                          <div className="space-y-1">
-                            <span className="font-mono text-[9px] uppercase tracking-wider text-[#141414]/50 block">
-                              Application Context
+                        <span className="flex min-w-0 items-center gap-4">
+                          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white">
+                            <Icon className="h-5 w-5" aria-hidden="true" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-sm font-medium text-white">{skill.name}</span>
+                            <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">
+                              {skill.level > 0 ? `Level ${skill.level} of 5` : "Exploring"}
                             </span>
-                            <p className="font-sans text-xs">{skill.description}</p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
-          </div>
-
-
-
+                          </span>
+                        </span>
+                        <span className="flex w-full max-w-48 items-center gap-3 sm:w-40">
+                          <span className="grid flex-1 grid-cols-5 gap-1" aria-hidden="true">
+                            {Array.from({ length: 5 }, (_, level) => (
+                              <span
+                                key={level}
+                                className={`h-1.5 rounded-full ${
+                                  level < skill.level ? "bg-white" : "bg-white/10"
+                                }`}
+                              />
+                            ))}
+                          </span>
+                          <span className="font-mono text-[10px] text-white/35">
+                            0{index + 1}
+                          </span>
+                        </span>
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="relative z-10 overflow-hidden"
+                          >
+                            <p className="mt-5 flex gap-3 border-t border-white/10 pt-4 text-sm leading-6 text-white/55">
+                              <Sparkles className="mt-1 h-4 w-4 shrink-0 text-white" aria-hidden="true" />
+                              {skill.description}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </SpotlightCard>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
-
       </div>
     </section>
   );

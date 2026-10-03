@@ -63,7 +63,7 @@ export default function App() {
   }, [isLoading, isMenuOpen]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden select-none bg-[#f5f2ed]">
+    <div className="relative min-h-screen overflow-hidden select-none bg-[#ededed]">
 
       {/* 1. Loading Preloader Screen */}
       <LoadingScreen 
@@ -105,7 +105,7 @@ export default function App() {
               }}
               transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
               className="relative min-h-screen text-[#141414] overflow-x-hidden shadow-2xl pointer-events-auto origin-center"
-              style={{ backgroundColor: "#f5f2ed" }}
+              style={{ backgroundColor: "#ededed" }}
             >
               {/* If menu is open, render a clean interceptor overlay to safely snap back on click with soft shadow */}
               {isMenuOpen && (

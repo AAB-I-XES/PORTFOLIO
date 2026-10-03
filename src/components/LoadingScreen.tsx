@@ -57,7 +57,7 @@ export default function LoadingScreen({ onComplete, onExitStart }: LoadingScreen
                   } 
                 }}
                 style={{ originY: i % 2 === 0 ? 0 : 1 }}
-                className="flex-1 h-full bg-[#f5f2ed] border-r border-[#141414]/5 last:border-r-0"
+                className="flex-1 h-full bg-[#ededed] border-r border-[#141414]/5 last:border-r-0"
               />
             ))}
           </div>
@@ -133,7 +133,7 @@ export default function LoadingScreen({ onComplete, onExitStart }: LoadingScreen
                   />
                   <motion.path
                     d="M28 50 L72 50"
-                    stroke="#ffd6e0"
+                    stroke="#777777"
                     strokeWidth="1.5"
                     strokeLinecap="round"
                     initial={{ pathLength: 0 }}
