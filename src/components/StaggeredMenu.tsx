@@ -39,11 +39,12 @@ interface StaggeredMenuRowProps {
   item: StaggeredMenuItem;
   index: number;
   numbering: boolean;
+  open: boolean;
   speed: number;
   onSelect: (event: MouseEvent<HTMLAnchorElement>, item: StaggeredMenuItem) => void;
 }
 
-function StaggeredMenuRow({ item, index, numbering, speed, onSelect }: StaggeredMenuRowProps) {
+function StaggeredMenuRow({ item, index, numbering, open, speed, onSelect }: StaggeredMenuRowProps) {
   const itemRef = useRef<HTMLAnchorElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
   const marqueeInnerRef = useRef<HTMLDivElement>(null);
@@ -80,7 +81,9 @@ function StaggeredMenuRow({ item, index, numbering, speed, onSelect }: Staggered
       ease: "none",
       repeat: -1,
     });
-    return () => horizontalTweenRef.current?.kill();
+    return () => {
+      horizontalTweenRef.current?.kill();
+    };
   }, [item.label, item.image, repetitions, speed]);
 
   const animateEnter = (event?: MouseEvent<HTMLAnchorElement> | FocusEvent<HTMLAnchorElement>) => {
@@ -121,7 +124,9 @@ function StaggeredMenuRow({ item, index, numbering, speed, onSelect }: Staggered
     });
   };
 
-  useEffect(() => () => hoverTweenRef.current?.kill(), []);
+  useEffect(() => () => {
+    hoverTweenRef.current?.kill();
+  }, []);
 
   return (
     <li className="sm-panel-itemWrap">
@@ -130,7 +135,7 @@ function StaggeredMenuRow({ item, index, numbering, speed, onSelect }: Staggered
         className="sm-panel-item"
         href={item.link}
         aria-label={item.ariaLabel}
-        tabIndex={-1}
+        tabIndex={open ? 0 : -1}
         data-number={numbering ? String(index + 1).padStart(2, "0") : undefined}
         onMouseEnter={animateEnter}
         onMouseLeave={animateLeave}
@@ -371,6 +376,7 @@ export default function StaggeredMenu({
                   item={item}
                   index={index}
                   numbering={displayItemNumbering}
+                  open={open}
                   speed={marqueeSpeed}
                   onSelect={handleItemClick}
                 />
