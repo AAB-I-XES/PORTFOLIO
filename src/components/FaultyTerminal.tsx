@@ -86,9 +86,6 @@ float fbm(vec2 p) {
   p = rotate(time * 0.02) * p * 2.0;
   amp *= 0.454545;
   f += amp * noise(p);
-  p = rotate(time * 0.02) * p * 2.0;
-  amp *= 0.454545;
-  f += amp * noise(p);
   return f;
 }
 float pattern(vec2 p, out vec2 q, out vec2 r) {
@@ -310,12 +307,13 @@ export default function FaultyTerminal({
     }
 
     const handleMouseMove = (event: PointerEvent) => {
+      if (!visible) return;
       const rect = container.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      mouseRef.current = {
-        x: (event.clientX - rect.left) / rect.width,
-        y: 1 - (event.clientY - rect.top) / rect.height,
-      };
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      if (x < 0 || x > 1 || y < 0 || y > 1) return;
+      mouseRef.current = { x, y: 1 - y };
       start();
     };
 

@@ -316,7 +316,7 @@ if (uLightMode > 0.5) {
   );
 
   return (
-    <Canvas dpr={[1, 2]} frameloop="always" className="beams-container">
+    <Canvas dpr={[0.8, 1.25]} frameloop="always" className="beams-container">
       <group rotation={[0, 0, THREE.MathUtils.degToRad(rotation)]}>
         <PlaneNoise
           ref={mesh}

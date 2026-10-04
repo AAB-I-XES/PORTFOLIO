@@ -2,8 +2,6 @@ import { useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { ArrowLeft, ArrowRight, MoveUpRight } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
-import GlassSurface from "./GlassSurface";
-import LiquidButton from "./LiquidButton";
 import SpotlightCard from "./SpotlightCard";
 import ovcharBg from "../../assets/ovchar.png";
 import pic3 from "../../assets/pic3.jpg";
@@ -136,13 +134,6 @@ export default function BioSection() {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-black/10" />
-                  <GlassSurface
-                    width="100%"
-                    height="100%"
-                    borderRadius={28}
-                    className="bio-profile-glass"
-                    style={{ position: "absolute", inset: 0 }}
-                  />
                   <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
                     <div>
                       <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.2em] text-white">
@@ -162,22 +153,22 @@ export default function BioSection() {
               Profile carousel
             </span>
             <div className="flex items-center gap-2">
-              <LiquidButton
+              <button
                 type="button"
                 onClick={() => moveCard(-1)}
                 aria-label="Previous profile card"
-                className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-white transition hover:border-white"
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-[#171a20] text-white transition hover:border-white hover:bg-white hover:text-black"
               >
                 <ArrowLeft className="h-4 w-4" />
-              </LiquidButton>
-              <LiquidButton
+              </button>
+              <button
                 type="button"
                 onClick={() => moveCard(1)}
                 aria-label="Next profile card"
-                className="grid h-9 w-9 place-items-center rounded-full border border-white/15 text-white transition hover:border-white"
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-[#171a20] text-white transition hover:border-white hover:bg-white hover:text-black"
               >
                 <ArrowRight className="h-4 w-4" />
-              </LiquidButton>
+              </button>
             </div>
           </div>
         </motion.div>

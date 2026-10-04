@@ -38,7 +38,7 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
-      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#101318] px-6 pt-0 pb-24 text-[#f3f3ee] md:px-12"
+      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#101318] px-6 pt-12 pb-24 text-[#f3f3ee] md:px-12 md:pt-16"
     >
       <TerminalSectionBackground />
       <div className="pointer-events-none absolute -bottom-48 left-1/3 h-[30rem] w-[30rem] rounded-full bg-white/[0.055] blur-[130px]" />

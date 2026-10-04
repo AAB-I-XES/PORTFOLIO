@@ -337,7 +337,7 @@ const FlexCarousel = ({
     if (!container) return undefined;
 
     const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      dpr: Math.min(window.devicePixelRatio || 1, 1.25),
       alpha: true,
       premultipliedAlpha: true,
       antialias: false,
