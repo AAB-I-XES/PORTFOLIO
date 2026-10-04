@@ -133,14 +133,6 @@ export default function HeroSection({ onScrollToNext, onScrollToContact }: HeroS
       {/* Top spacing placeholder matching Header layout */}
       <div className="h-12 w-full relative z-10 md:h-16" />
 
-      <div className="relative z-10 mb-6 flex justify-center">
-        <img
-          src="/icon.svg"
-          alt="DIBRAB logo"
-          className="h-20 w-auto drop-shadow-[0_14px_40px_rgba(20,20,20,0.18)] md:h-28"
-        />
-      </div>
-
       {/* Main Core Content Container */}
       <div className="relative w-full flex-1 flex flex-col justify-center items-center z-10 max-w-6xl px-4 sm:px-6 translate-y-8 md:translate-y-10">
 
