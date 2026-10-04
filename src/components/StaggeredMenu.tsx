@@ -22,7 +22,6 @@ interface StaggeredMenuProps {
   displaySocials?: boolean;
   displayItemNumbering?: boolean;
   className?: string;
-  logoUrl?: string;
   menuButtonColor?: string;
   openMenuButtonColor?: string;
   accentColor?: string;
@@ -169,7 +168,6 @@ export default function StaggeredMenu({
   displaySocials = true,
   displayItemNumbering = true,
   className = "",
-  logoUrl,
   menuButtonColor = "#ffffff",
   openMenuButtonColor = "#ffffff",
   accentColor = "#d7d7d7",
@@ -197,7 +195,7 @@ export default function StaggeredMenu({
     const wrapper = wrapperRef.current;
     if (!panel || !wrapper) return;
     const layers = Array.from(wrapper.querySelectorAll<HTMLElement>(".sm-prelayer"));
-    const headerItems = Array.from(wrapper.querySelectorAll<HTMLElement>(".sm-logo, .sm-toggle"));
+    const headerItems = Array.from(wrapper.querySelectorAll<HTMLElement>(".sm-toggle"));
     const context = gsap.context(() => {
       gsap.set([panel, ...layers], { yPercent: -100, opacity: 1 });
       gsap.set(toggleRef.current, { color: menuButtonColor });
@@ -341,23 +339,7 @@ export default function StaggeredMenu({
         ))}
       </div>
 
-      <header className="staggered-menu-header" aria-label="Main navigation header">
-        <a
-          className="sm-logo"
-          href="#hero"
-          aria-label="Dibyajyoti Rabha, home"
-          onClick={(event) => {
-            event.preventDefault();
-            closeMenu();
-            window.setTimeout(() => onItemSelect?.({ label: "Home", ariaLabel: "Go to home", link: "#hero" }), 340);
-          }}
-        >
-          {logoUrl ? <img src={logoUrl} alt="" className="sm-logo-img" /> : <span className="sm-logo-mark">D</span>}
-          <span className="sm-logo-copy">
-            <strong>DIBYAJYOTI R.</strong>
-            <small>DEVELOPER / ILLUSTRATOR</small>
-          </span>
-        </a>
+      <header className="staggered-menu-header" aria-label="Navigation controls">
         <button
           ref={toggleRef}
           className="sm-toggle"

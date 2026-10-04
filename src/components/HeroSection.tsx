@@ -7,18 +7,12 @@ import TextLoop from "./TextLoop";
 
 interface HeroSectionProps {
   onScrollToNext: () => void;
+  onScrollToContact: () => void;
 }
 
-export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
+export default function HeroSection({ onScrollToNext, onScrollToContact }: HeroSectionProps) {
   const [localTime, setLocalTime] = useState("");
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleContactClick = () => {
-    const target = document.getElementById("contact");
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
 
   // Update Guwahati Local Time in real-time
   useEffect(() => {
@@ -106,43 +100,36 @@ export default function HeroSection({ onScrollToNext }: HeroSectionProps) {
         <span className="absolute top-2 right-3 font-mono text-[8px] text-[#141414]/30">2026_EDITION</span>
       </div>
 
+      <motion.button
+        type="button"
+        aria-label="Contact for info"
+        onClick={onScrollToContact}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="hero-contact-ribbon focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#141414]"
+      >
+        <TextLoop
+          className="text-loop-contact"
+          text="Contact for info"
+          shape="line"
+          speed={90}
+          separator="✦"
+          fontSize={36}
+          fontWeight={700}
+          letterSpacing={2}
+          color="#ededed"
+          ribbonColor="#141414"
+          ribbonWidth={24}
+          pauseOnHover
+        />
+      </motion.button>
+
       {/* Top spacing placeholder matching Header layout */}
-      <div className="h-24 w-full relative z-10 md:h-28" />
+      <div className="h-12 w-full relative z-10 md:h-16" />
 
       {/* Main Core Content Container */}
-      <div className="relative w-full flex-1 flex flex-col justify-center items-center z-10 max-w-6xl px-4 sm:px-6">
-        
-        {/* A. CONTACT FOR INFO PILL BUTTON */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-4 flex flex-col items-center gap-3"
-        >
-          <button
-            type="button"
-            aria-label="Contact for info"
-            onClick={handleContactClick}
-            className="block border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#141414]"
-          >
-            <TextLoop
-              className="text-loop-contact"
-              text="Contact for info"
-              shape="wave"
-              speed={55}
-              separator="✦"
-              curviness={12}
-              fontSize={64}
-              fontWeight={700}
-              letterSpacing={3}
-              color="#ededed"
-              ribbonColor="#141414"
-              ribbonWidth={50}
-              pauseOnHover
-            />
-          </button>
-          <div className="hidden" />
-        </motion.div>
+      <div className="relative w-full flex-1 flex flex-col justify-center items-center z-10 max-w-6xl px-4 sm:px-6 translate-y-8 md:translate-y-10">
 
         {/* B. HERO TYPOGRAPHY FRAME */}
         <div className="relative w-full flex flex-col items-center justify-center text-center">

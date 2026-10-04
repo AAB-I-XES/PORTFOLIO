@@ -47,7 +47,7 @@ body {
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* Custom Hand-Drawn Sketch Grid or Background Dots - with pink dot variant */

@@ -21,8 +21,8 @@
   inset: 0 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 20px 32px;
+  justify-content: center;
+  padding: 40px 32px 20px;
   pointer-events: none;
   z-index: 20;
 }
@@ -31,57 +31,16 @@
   pointer-events: auto;
 }
 
-.sm-logo {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  color: #f4f4f4;
-  text-decoration: none;
-}
-
-.sm-logo-mark {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border: 1px solid rgb(255 255 255 / 30%);
-  font-family: var(--font-display);
-  font-size: 20px;
-}
-
-.sm-logo-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.sm-logo-copy strong {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-}
-
-.sm-logo-copy small {
-  color: rgb(255 255 255 / 54%);
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: 0.08em;
-}
-
-.sm-logo-img {
-  display: block;
-  width: auto;
-  height: 30px;
-  object-fit: contain;
-}
-
 .sm-toggle {
   display: inline-flex;
-  min-height: 42px;
+  min-width: 144px;
+  min-height: 48px;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  padding: 0 15px;
+  padding: 0 24px;
   border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 999px;
   background: rgb(0 0 0 / 76%);
   color: #fff;
   cursor: pointer;
@@ -324,12 +283,7 @@
 
 @media (max-width: 720px) {
   .staggered-menu-header {
-    padding: 16px 18px;
-  }
-
-  .sm-logo-mark {
-    width: 36px;
-    height: 36px;
+    padding: 34px 18px 16px;
   }
 
   .staggered-menu-panel {

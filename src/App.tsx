@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 import LoadingScreen from "./components/LoadingScreen";
 import StaggeredMenu, { type StaggeredMenuItem } from "./components/StaggeredMenu";
 import HeroSection from "./components/HeroSection";
@@ -29,6 +32,7 @@ const socialItems = [
 
 export default function App() {
   const prefersReducedMotion = useReducedMotion();
+  const smootherRef = useRef<ScrollSmoother | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isExitingLoader, setIsExitingLoader] = useState(false);
   const [isBeamTransitionActive, setIsBeamTransitionActive] = useState(false);
@@ -38,10 +42,11 @@ export default function App() {
   const handleScrollToSection = (targetId: string) => {
     const target = document.getElementById(targetId);
     if (target) {
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
+      if (smootherRef.current) {
+        smootherRef.current.scrollTo(target, !prefersReducedMotion, "top top");
+      } else {
+        target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+      }
     }
   };
   const handleMenuItemSelect = (item: StaggeredMenuItem) => {
@@ -68,8 +73,26 @@ export default function App() {
     };
   }, [isLoading, isMenuOpen]);
 
+  useEffect(() => {
+    if (isLoading) return;
+
+    gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+    const smoother = ScrollSmoother.create({
+      wrapper: "#smooth-wrapper",
+      content: "#smooth-content",
+      smooth: prefersReducedMotion ? 0 : 1.2,
+      effects: !prefersReducedMotion,
+    });
+    smootherRef.current = smoother;
+
+    return () => {
+      smoother.kill();
+      smootherRef.current = null;
+    };
+  }, [isLoading, prefersReducedMotion]);
+
   return (
-    <div className="relative min-h-screen overflow-hidden select-none bg-[#ededed]">
+    <div className="relative min-h-screen overflow-x-clip select-none bg-[#ededed]">
 
       {/* 1. Loading Preloader Screen */}
       <LoadingScreen 
@@ -144,48 +167,56 @@ export default function App() {
               onItemSelect={handleMenuItemSelect}
             />
 
-            {/* The Main Webpage Canvas */}
-            <motion.div
-              initial={prefersReducedMotion
-                ? { opacity: 0 }
-                : {
-                    opacity: 0,
-                    scale: 1.035,
-                    y: 24,
-                    filter: "blur(14px)",
-                    clipPath: "inset(48% 0 48% round 24px)",
+            {/* Keep the smoother's fixed viewport wrapper outside animated transforms. */}
+            <div id="smooth-wrapper">
+              <div id="smooth-content">
+                {/* The Main Webpage Canvas */}
+                <motion.div
+                  initial={prefersReducedMotion
+                    ? { opacity: 0 }
+                    : {
+                        opacity: 0,
+                        scale: 1.035,
+                        y: 24,
+                        filter: "blur(14px)",
+                        clipPath: "inset(48% 0 48% round 24px)",
+                      }}
+                  animate={{
+                    opacity: 1,
+                    scale: isMenuOpen ? 0.94 : 1,
+                    y: isMenuOpen ? 24 : 0,
+                    filter: "blur(0px)",
+                    borderRadius: isMenuOpen ? "28px" : "0px",
+                    clipPath: "inset(0% 0% 0% round 0px)",
                   }}
-              animate={{
-                opacity: 1,
-                scale: isMenuOpen ? 0.94 : 1,
-                y: isMenuOpen ? 24 : 0,
-                filter: "blur(0px)",
-                borderRadius: isMenuOpen ? "28px" : "0px",
-                clipPath: "inset(0% 0% 0% round 0px)",
-              }}
-              transition={{ duration: prefersReducedMotion ? 0.2 : 1.65, ease: [0.16, 1, 0.3, 1] }}
-              className="relative min-h-screen overflow-x-hidden shadow-2xl pointer-events-auto origin-center text-[#141414]"
-              style={{ backgroundColor: "#ededed" }}
-            >
-              {/* If menu is open, render a clean interceptor overlay to safely snap back on click with soft shadow */}
-              {isMenuOpen && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.4 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="absolute inset-0 z-50 cursor-pointer pointer-events-auto bg-[#0a0a0a]"
-                />
-              )}
+                  transition={{ duration: prefersReducedMotion ? 0.2 : 1.65, ease: [0.16, 1, 0.3, 1] }}
+                  className="relative min-h-screen overflow-x-hidden shadow-2xl pointer-events-auto origin-center text-[#141414]"
+                  style={{ backgroundColor: "#ededed" }}
+                >
+                  {/* If menu is open, render a clean interceptor overlay to safely snap back on click with soft shadow */}
+                  {isMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.4 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.5 }}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="absolute inset-0 z-50 cursor-pointer pointer-events-auto bg-[#0a0a0a]"
+                    />
+                  )}
 
-              <HeroSection onScrollToNext={handleScrollToNext} />
-              <BioSection />
-              <SkillsSection />
-              <ProjectsSection />
-              <ContactSection />
-              <Footer onScrollToTop={handleScrollToTop} />
-            </motion.div>
+                  <HeroSection
+                    onScrollToNext={handleScrollToNext}
+                    onScrollToContact={() => handleScrollToSection("contact")}
+                  />
+                  <BioSection />
+                  <SkillsSection />
+                  <ProjectsSection />
+                  <ContactSection />
+                  <Footer onScrollToTop={handleScrollToTop} />
+                </motion.div>
+              </div>
+            </div>
           </>
         )}
       </AnimatePresence>
