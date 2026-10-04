@@ -1,9 +1,5 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { gsap } from "gsap";
-import { ArrowUpRight, GitFork, Github, Star } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import type { Project } from "../types";
-import BlurText from "./BlurText";
 import FlexCarousel from "./FlexCarousel";
 
 type ProjectFilter = "all" | "originals" | "forks";
@@ -186,110 +182,7 @@ function getPreviewSources(project: Project) {
   };
 }
 
-function ProjectStory({
-  project,
-  index,
-  isLoading,
-}: {
-  project: Project;
-  index: number;
-  isLoading: boolean;
-}) {
-  const prefersReducedMotion = useReducedMotion();
-
-  return (
-    <motion.article
-      animate={prefersReducedMotion ? undefined : {
-        y: [0, 8, 0, -7, 0],
-        rotateX: [0, -0.6, 0, 0.6, 0],
-        rotateY: [0, 0.35, 0, -0.35, 0],
-      }}
-      transition={prefersReducedMotion ? undefined : {
-        duration: 8,
-        ease: "easeInOut",
-        repeat: Infinity,
-      }}
-      className="rounded-2xl border border-white/10 bg-[#12151b]/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:p-8"
-    >
-      <div className="mb-8 flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">
-        <span>Chapter {String(index + 1).padStart(2, "0")} / {project.year}</span>
-        {project.isFork && <span className="flex items-center gap-1"><GitFork className="h-3 w-3" /> Fork</span>}
-      </div>
-      <div className="mb-7 block w-full text-left">
-        <span className="mb-5 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.19em] text-white/40">
-          <span className="h-px w-7 bg-white" />
-          {project.isFork ? "Open-source contribution" : "Original project"}
-        </span>
-        <BlurText
-          text={project.title}
-          delay={65}
-          animateBy="words"
-          direction="bottom"
-          className="font-display text-4xl leading-[0.98] tracking-tight text-white sm:text-5xl md:text-6xl"
-        />
-        <span className="mt-5 block font-mono text-[10px] uppercase tracking-[0.13em] text-white/40 sm:text-xs">
-          {project.category}
-        </span>
-      </div>
-      <BlurText
-        key={`${project.id}-description`}
-        text={project.description}
-        delay={22}
-        stepDuration={0.24}
-        animateBy="words"
-        direction="bottom"
-        className="max-w-2xl text-sm leading-7 text-white/60 sm:text-base sm:leading-8"
-      />
-      <div className="mt-6 flex flex-wrap gap-2">
-        {project.tags.slice(0, 5).map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 font-mono text-[9px] text-white/50 sm:text-[10px]"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-        <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/40">
-          <Star className="h-3.5 w-3.5 text-white/75" /> {project.stars ?? 0}
-        </span>
-        <span className="flex items-center gap-1.5 font-mono text-[10px] text-white/40">
-          <GitFork className="h-3.5 w-3.5 text-white/55" /> {project.forks ?? 0}
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-white/35">
-          {project.role}
-        </span>
-      </div>
-      <div className="mt-7 flex flex-wrap items-center gap-3">
-        {project.htmlUrl && (
-          <a
-            href={project.htmlUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-semibold text-black transition hover:bg-white/80"
-          >
-            <Github className="h-4 w-4" />
-            Explore project
-            <ArrowUpRight className="h-4 w-4" />
-          </a>
-        )}
-        {isLoading && (
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-white/30">
-            Syncing GitHub details
-          </span>
-        )}
-      </div>
-    </motion.article>
-  );
-}
-
 export default function ProjectsSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const storyTransitionRef = useRef<HTMLDivElement>(null);
-  const carouselTransitionRef = useRef<HTMLDivElement>(null);
-  const previousProjectIdRef = useRef<string | null>(null);
-  const prefersReducedMotion = useReducedMotion();
   const [filter, setFilter] = useState<ProjectFilter>("all");
   const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -356,7 +249,6 @@ export default function ProjectsSection() {
     }),
     [filter, projects],
   );
-  const activeProject = filteredProjects[activeIndex] ?? filteredProjects[0] ?? null;
   const carouselItems = useMemo(
     () => filteredProjects.map((project) => ({
       src: getPreviewSources(project).src,
@@ -366,34 +258,6 @@ export default function ProjectsSection() {
     })),
     [filteredProjects],
   );
-
-  useLayoutEffect(() => {
-    if (!activeProject || previousProjectIdRef.current === activeProject.id) return;
-
-    previousProjectIdRef.current = activeProject.id;
-    const targets = [storyTransitionRef.current, carouselTransitionRef.current].filter(
-      (target): target is HTMLDivElement => target !== null,
-    );
-    if (prefersReducedMotion || targets.length === 0) return;
-
-    const context = gsap.context(() => {
-      gsap.fromTo(
-        targets,
-        { autoAlpha: 0.35, y: 22, filter: "blur(8px)" },
-        {
-          autoAlpha: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: 0.55,
-          ease: "power3.out",
-          stagger: 0.06,
-          overwrite: "auto",
-        },
-      );
-    }, sectionRef);
-
-    return () => context.revert();
-  }, [activeProject, prefersReducedMotion]);
 
   const chooseFilter = (nextFilter: ProjectFilter) => {
     setFilter(nextFilter);
@@ -407,11 +271,10 @@ export default function ProjectsSection() {
   return (
     <section
       id="projects"
-      ref={sectionRef}
-      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#0b0d10] px-6 pt-24 pb-0 text-[#f3f3ee] md:px-12 md:pt-28"
+      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#0b0d10] pt-24 pb-0 text-[#f3f3ee] md:pt-28"
     >
       <div className="pointer-events-none absolute -right-44 top-0 h-[34rem] w-[34rem] rounded-full bg-white/[0.045] blur-[140px]" />
-      <div className="relative mx-auto mb-10 flex w-full max-w-7xl flex-col justify-between gap-8 border-b border-white/10 pb-8 md:flex-row md:items-end">
+      <div className="relative mx-auto mb-10 flex w-full max-w-7xl flex-col justify-between gap-8 border-b border-white/10 px-6 pb-8 md:flex-row md:items-end md:px-12">
         <div>
           <span className="font-mono text-xs uppercase tracking-[0.2em] text-white">
             04 / Selected work
@@ -452,26 +315,24 @@ export default function ProjectsSection() {
       </div>
 
       {filteredProjects.length > 0 ? (
-        <div className="relative mx-auto w-full max-w-7xl">
-          <div ref={carouselTransitionRef} className="rounded-2xl border border-white/10 bg-white/[0.015]">
-            <FlexCarousel
-              items={carouselItems}
-              preset="liquid"
-              intro="rise"
-              fit="landscape"
-              cardHeight={0.48}
-              gap={18}
-              radius={12}
-              squeeze={0.12}
-              dispersion={0.04}
-              followCursor
-              focusOnClick
-              captions
-              onChange={selectProject}
-              className="text-white"
-              style={{ height: "min(64vh, 620px)", minHeight: "360px" }}
-            />
-          </div>
+        <div className="relative w-full">
+          <FlexCarousel
+            items={carouselItems}
+            preset="liquid"
+            intro="rise"
+            fit="landscape"
+            cardHeight={0.58}
+            gap={18}
+            radius={12}
+            squeeze={0.12}
+            dispersion={0.04}
+            followCursor
+            focusOnClick
+            captions
+            onChange={selectProject}
+            className="text-white"
+            style={{ height: "min(72vh, 760px)", minHeight: "380px" }}
+          />
 
           {isUsingFallback && (
             <p className="mt-4 text-center font-mono text-[9px] uppercase tracking-[0.13em] text-white/30">
@@ -479,15 +340,6 @@ export default function ProjectsSection() {
             </p>
           )}
 
-          {activeProject && (
-            <div ref={storyTransitionRef} className="mx-auto mt-8 max-w-3xl">
-              <ProjectStory
-                project={activeProject}
-                index={activeIndex}
-                isLoading={isLoading}
-              />
-            </div>
-          )}
         </div>
       ) : (
         <p className="mx-auto max-w-7xl py-24 text-center text-sm text-white/45">
