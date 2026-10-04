@@ -31,17 +31,25 @@
   pointer-events: auto;
 }
 
+.sm-toggle-glass {
+  flex: 0 0 auto;
+}
+
+.sm-toggle-glass .glass-surface__content {
+  padding: 0;
+}
+
 .sm-toggle {
   display: inline-flex;
-  min-width: 144px;
-  min-height: 48px;
+  width: 100%;
+  height: 100%;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 0 24px;
-  border: 1px solid rgb(255 255 255 / 45%);
-  border-radius: 999px;
-  background: rgb(0 0 0 / 76%);
+  padding: 0 18px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
   color: #fff;
   cursor: pointer;
   font-family: var(--font-mono);
@@ -49,10 +57,13 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  backdrop-filter: blur(8px);
 }
 
-.sm-toggle:focus-visible,
+.sm-toggle:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--sm-accent);
+}
+
 .sm-panel-item:focus-visible,
 .sm-socials-link:focus-visible {
   outline: 2px solid var(--sm-accent);

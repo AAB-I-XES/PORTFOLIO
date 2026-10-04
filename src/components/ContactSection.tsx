@@ -1,17 +1,20 @@
-import { useState, type FormEvent } from "react";
-import { ArrowUpRight, Check, Mail, MapPin, Send } from "lucide-react";
+import { useRef, useState, type FormEvent } from "react";
+import { ArrowUpRight, Mail, MapPin } from "lucide-react";
+import GlassSurface from "./GlassSurface";
 import SpotlightCard from "./SpotlightCard";
+import SlideCommit from "./SlideCommit";
+import TerminalSectionBackground from "./TerminalSectionBackground";
 
 const CONTACT_EMAIL = "rabhadibyajyoti05@gmail.com";
 
 export default function ContactSection() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [hasOpenedDraft, setHasOpenedDraft] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const openEmailDraft = () => {
     const subject = `Portfolio enquiry from ${name.trim()}`;
     const body = `${message.trim()}\n\n— ${name.trim()}\n${email.trim()}`;
     const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -20,13 +23,26 @@ export default function ContactSection() {
     setHasOpenedDraft(true);
   };
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    openEmailDraft();
+  };
+
+  const handleSlideConfirm = () => {
+    if (!formRef.current?.reportValidity()) {
+      throw new Error("Complete the required fields before composing an email.");
+    }
+    openEmailDraft();
+  };
+
   return (
     <section
       id="contact"
       className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#101318] px-6 pt-0 pb-24 text-[#f3f3ee] md:px-12"
     >
+      <TerminalSectionBackground />
       <div className="pointer-events-none absolute -bottom-48 left-1/3 h-[30rem] w-[30rem] rounded-full bg-white/[0.055] blur-[130px]" />
-      <div className="relative mx-auto mb-16 flex w-full max-w-7xl items-end justify-between border-b border-white/10 pb-6">
+      <div className="relative z-10 mx-auto mb-16 flex w-full max-w-7xl items-end justify-between border-b border-white/10 pb-6">
         <div>
           <span className="font-mono text-xs uppercase tracking-[0.2em] text-white">
             05 / Contact
@@ -40,30 +56,32 @@ export default function ContactSection() {
         </span>
       </div>
 
-      <div className="relative mx-auto grid w-full max-w-7xl gap-14 lg:grid-cols-12 lg:gap-20">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-14 lg:grid-cols-12 lg:gap-20">
         <div className="space-y-10 lg:col-span-5">
           <p className="max-w-lg text-lg leading-8 text-white/60">
             Have a thoughtful project, a creative idea, or a question? I’m available for select
             freelance and collaboration opportunities.
           </p>
 
-          <SpotlightCard className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 sm:p-8">
-            <span className="relative z-10 font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
-              Direct line
-            </span>
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="relative z-10 mt-3 flex flex-wrap items-center gap-2 text-lg text-white transition hover:text-white/70 sm:text-xl"
-            >
-              <Mail className="h-5 w-5 text-white" aria-hidden="true" />
-              {CONTACT_EMAIL}
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-            <div className="relative z-10 mt-7 flex items-center gap-3 border-t border-white/10 pt-5 text-sm text-white/50">
-              <MapPin className="h-4 w-4 text-white" aria-hidden="true" />
-              Guwahati, Assam, India
-            </div>
-          </SpotlightCard>
+          <GlassSurface width="100%" height="max-content" borderRadius={18} className="contact-glass-card">
+            <SpotlightCard className="w-full rounded-2xl border border-white/10 bg-white/[0.025] p-6 sm:p-8">
+              <span className="relative z-10 font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
+                Direct line
+              </span>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="relative z-10 mt-3 flex flex-wrap items-center gap-2 text-lg text-white transition hover:text-white/70 sm:text-xl"
+              >
+                <Mail className="h-5 w-5 text-white" aria-hidden="true" />
+                {CONTACT_EMAIL}
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <div className="relative z-10 mt-7 flex items-center gap-3 border-t border-white/10 pt-5 text-sm text-white/50">
+                <MapPin className="h-4 w-4 text-white" aria-hidden="true" />
+                Guwahati, Assam, India
+              </div>
+            </SpotlightCard>
+          </GlassSurface>
 
           <div className="flex flex-wrap gap-3">
             <a
@@ -85,8 +103,9 @@ export default function ContactSection() {
           </div>
         </div>
 
-        <SpotlightCard className="rounded-2xl border border-white/10 bg-[#171a20] p-6 sm:p-8 lg:col-span-7">
-          <form onSubmit={handleSubmit} className="relative z-10 space-y-7">
+        <GlassSurface width="100%" height="max-content" borderRadius={18} className="contact-glass-card lg:col-span-7">
+          <SpotlightCard className="w-full rounded-2xl border border-white/10 bg-[#171a20]/75 p-6 sm:p-8">
+            <form ref={formRef} onSubmit={handleSubmit} className="relative z-10 space-y-7">
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
                 <label htmlFor="contact-name" className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/45">
@@ -138,23 +157,30 @@ export default function ContactSection() {
             </div>
             <div className="flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center">
               <p className="max-w-sm text-xs leading-5 text-white/35">
-                This opens a pre-filled draft in your email app. Your message is not stored on this site.
+                Slide to open a pre-filled draft in your email app. Your message is not stored on this site.
               </p>
-              <button
-                type="submit"
-                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-semibold text-[#11140c] transition hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#171a20]"
-              >
-                {hasOpenedDraft ? <Check className="h-4 w-4" /> : <Send className="h-4 w-4" />}
-                {hasOpenedDraft ? "Draft requested" : "Compose email"}
-              </button>
+              <SlideCommit
+                label={hasOpenedDraft ? "Draft requested" : "Slide to compose"}
+                doneLabel="Draft ready"
+                errorLabel="Check required fields"
+                onConfirm={handleSlideConfirm}
+                disabled={hasOpenedDraft}
+                width={280}
+                height={56}
+                trackColor="#0d0f13"
+                handleColor="#f5f5f5"
+                successColor="#b8d8c0"
+                dangerColor="#e5484d"
+              />
             </div>
             {hasOpenedDraft && (
               <p role="status" className="text-xs text-white">
                 Your email app should open with the message ready. If it didn’t, email {CONTACT_EMAIL}.
               </p>
             )}
-          </form>
-        </SpotlightCard>
+            </form>
+          </SpotlightCard>
+        </GlassSurface>
       </div>
     </section>
   );

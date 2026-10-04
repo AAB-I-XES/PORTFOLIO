@@ -1,0 +1,62 @@
+.liquid-button-surface {
+  display: inline-flex;
+  flex: 0 0 auto;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.liquid-button-surface--light.glass-surface--svg {
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(20, 20, 20, 0.18);
+}
+
+.liquid-button-surface--light.glass-surface--fallback {
+  border-color: rgba(20, 20, 20, 0.18);
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.liquid-button-surface .glass-surface__content {
+  width: max-content;
+  height: max-content;
+  padding: 2px;
+}
+
+.liquid-button-surface--full {
+  display: flex;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.liquid-button-surface--full .glass-surface__content {
+  width: 100%;
+}
+
+.liquid-button-surface[data-active] {
+  filter: brightness(1.2);
+}
+
+.liquid-button-control {
+  border-color: transparent !important;
+  border-radius: inherit;
+  background-color: transparent !important;
+}
+
+.liquid-button-control:focus-visible {
+  outline: 2px solid var(--sm-accent, rgba(255, 255, 255, 0.8));
+  outline-offset: 2px;
+}
+
+.liquid-button-surface:hover {
+  filter: brightness(1.15);
+}
+
+.liquid-button-surface:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-button-surface {
+    transition: none;
+  }
+}

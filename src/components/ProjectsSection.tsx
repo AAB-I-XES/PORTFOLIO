@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Project } from "../types";
 import FlexCarousel from "./FlexCarousel";
+import LiquidButton from "./LiquidButton";
 
 type ProjectFilter = "all" | "originals" | "forks";
 
@@ -292,14 +293,15 @@ export default function ProjectsSection() {
             { id: "originals", label: "Originals" },
             { id: "forks", label: "Forks" },
           ] as { id: ProjectFilter; label: string }[]).map(({ id, label }) => (
-            <button
+            <LiquidButton
               key={id}
               type="button"
+              active={filter === id}
               onClick={() => chooseFilter(id)}
               aria-pressed={filter === id}
               className={`rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.12em] transition ${
                 filter === id
-                  ? "border-white bg-white text-[#11140c]"
+                  ? "border-white/55 text-white"
                   : "border-white/15 text-white/55 hover:border-white/40 hover:text-white"
               }`}
             >
@@ -309,7 +311,7 @@ export default function ProjectsSection() {
                   ? projects.length
                   : projects.filter((project) => (id === "forks" ? project.isFork : !project.isFork)).length}
               </span>
-            </button>
+            </LiquidButton>
           ))}
         </div>
       </div>

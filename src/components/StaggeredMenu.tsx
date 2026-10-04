@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type MouseEvent } from "react";
 import { gsap } from "gsap";
+import GlassSurface from "./GlassSurface";
 import "./StaggeredMenu.css";
 
 export interface StaggeredMenuItem {
@@ -340,21 +341,38 @@ export default function StaggeredMenu({
       </div>
 
       <header className="staggered-menu-header" aria-label="Navigation controls">
-        <button
-          ref={toggleRef}
-          className="sm-toggle"
-          type="button"
-          aria-label={open ? "Close navigation" : "Open navigation"}
-          aria-expanded={open}
-          aria-controls="staggered-menu-panel"
-          onClick={toggleMenu}
+        <GlassSurface
+          width={144}
+          height={48}
+          borderRadius={999}
+          borderWidth={0.12}
+          brightness={20}
+          opacity={0.9}
+          blur={12}
+          displace={2.4}
+          backgroundOpacity={0.18}
+          saturation={1.65}
+          distortionScale={-180}
+          greenOffset={12}
+          blueOffset={24}
+          className="sm-toggle-glass"
         >
-          <span>{open ? "Close" : "Menu"}</span>
-          <span ref={iconRef} className="sm-icon" aria-hidden="true">
-            <span className="sm-icon-line" />
-            <span className="sm-icon-line sm-icon-line-v" />
-          </span>
-        </button>
+          <button
+            ref={toggleRef}
+            className="sm-toggle"
+            type="button"
+            aria-label={open ? "Close navigation" : "Open navigation"}
+            aria-expanded={open}
+            aria-controls="staggered-menu-panel"
+            onClick={toggleMenu}
+          >
+            <span>{open ? "Close" : "Menu"}</span>
+            <span ref={iconRef} className="sm-icon" aria-hidden="true">
+              <span className="sm-icon-line" />
+              <span className="sm-icon-line sm-icon-line-v" />
+            </span>
+          </button>
+        </GlassSurface>
       </header>
 
       <aside

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowDown, Compass, Cpu, Sparkles, Globe } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
 import Beams from "./Beams";
+import GlassSurface from "./GlassSurface";
+import LiquidButton from "./LiquidButton";
 import TextLoop from "./TextLoop";
 
 interface HeroSectionProps {
@@ -109,20 +111,23 @@ export default function HeroSection({ onScrollToNext, onScrollToContact }: HeroS
         transition={{ duration: 1.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         className="hero-contact-ribbon focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#141414]"
       >
-        <TextLoop
-          className="text-loop-contact"
-          text="Contact for info"
-          shape="line"
-          speed={90}
-          separator="✦"
-          fontSize={36}
-          fontWeight={700}
-          letterSpacing={2}
-          color="#ededed"
-          ribbonColor="#141414"
-          ribbonWidth={24}
-          pauseOnHover
-        />
+        <GlassSurface width="100%" height="clamp(44px, 5vw, 68px)" className="hero-contact-glass">
+          <TextLoop
+            className="text-loop-contact"
+            text="Contact for info"
+            shape="line"
+            speed={90}
+            separator="✦"
+            fontSize={36}
+            fontWeight={700}
+            letterSpacing={2}
+            color="#141414"
+            ribbonColor="#141414"
+            ribbonWidth={24}
+            ribbon={false}
+            pauseOnHover
+          />
+        </GlassSurface>
       </motion.button>
 
       {/* Top spacing placeholder matching Header layout */}
@@ -224,15 +229,15 @@ export default function HeroSection({ onScrollToNext, onScrollToContact }: HeroS
         </div>
 
         {/* Scroll helper button */}
-        <button
+        <LiquidButton
           onClick={onScrollToNext}
-          className="mx-auto md:mx-0 flex flex-col items-center gap-2 font-mono text-xs text-[#141414] hover:text-[#141414]/70 transition-colors uppercase tracking-[0.2em] font-bold cursor-pointer group"
+          radius={999}
+          surfaceClassName="liquid-button-surface--light"
+          className="mx-auto md:mx-0 inline-flex items-center gap-3 px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-[#141414]"
         >
-          <span className="group-hover:translate-y-0.5 transition-transform text-[10px]">Scroll to Explore</span>
-          <div className="w-8 h-12 rounded-full border border-[#141414]/25 flex items-start justify-center p-2.5 bg-white/40 shadow-xs">
-            <div className="w-1.5 h-2.5 rounded-full bg-[#141414]" />
-          </div>
-        </button>
+          <span>Scroll to explore</span>
+          <ArrowDown className="h-4 w-4" aria-hidden="true" />
+        </LiquidButton>
 
         {/* Real-time calculated Local Time */}
         <div className="hidden md:flex flex-col items-end font-mono text-[9px] tracking-widest text-[#141414]/45 uppercase text-right gap-1">

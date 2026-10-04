@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SKILLS_CATEGORIES } from "../data";
+import LiquidButton from "./LiquidButton";
 import SpotlightCard from "./SpotlightCard";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -69,9 +70,12 @@ export default function SkillsSection() {
             {SKILLS_CATEGORIES.map((category, index) => {
               const isActive = index === activeCategoryIdx;
               return (
-                <button
+                <LiquidButton
                   key={category.title}
                   type="button"
+                  fullWidth
+                  radius={16}
+                  active={isActive}
                   onClick={() => {
                     setActiveCategoryIdx(index);
                     setSelectedSkillName(null);
@@ -79,8 +83,8 @@ export default function SkillsSection() {
                   aria-pressed={isActive}
                   className={`group relative w-full overflow-hidden rounded-xl border p-4 text-left transition-colors ${
                     isActive
-                      ? "border-white/40 bg-white/[0.08]"
-                      : "border-white/10 bg-white/[0.025] hover:border-white/25"
+                      ? "border-white/45 text-white"
+                      : "border-white/20 text-white/75 hover:border-white/45"
                   }`}
                 >
                   <span className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">
@@ -90,7 +94,7 @@ export default function SkillsSection() {
                   <span className="mt-3 block text-sm font-medium text-white">
                     {category.title}
                   </span>
-                </button>
+                </LiquidButton>
               );
             })}
           </div>
@@ -122,8 +126,11 @@ export default function SkillsSection() {
                         isExpanded ? "border-white/40" : "border-white/[0.08]"
                       }`}
                     >
-                      <button
+                      <LiquidButton
                         type="button"
+                        fullWidth
+                        radius={14}
+                        active={isExpanded}
                         onClick={() => setSelectedSkillName(isExpanded ? null : skill.name)}
                         aria-expanded={isExpanded}
                         className="relative z-10 flex w-full flex-col gap-5 text-left sm:flex-row sm:items-center sm:justify-between"
@@ -154,7 +161,7 @@ export default function SkillsSection() {
                             0{index + 1}
                           </span>
                         </span>
-                      </button>
+                      </LiquidButton>
                       <AnimatePresence initial={false}>
                         {isExpanded && (
                           <motion.div
