@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { ArrowLeft, ArrowRight, MoveUpRight } from "lucide-react";
 import { BIO_SUMMARY } from "../data";
 import SpotlightCard from "./SpotlightCard";
+import ScrollFloat from "./ScrollFloat";
 import ovcharBg from "../../assets/ovchar.png";
 import pic3 from "../../assets/pic3.jpg";
 
@@ -73,10 +74,10 @@ export default function BioSection() {
     <section
       id="bio"
       ref={containerRef}
-      className="relative isolate flex min-h-screen w-full flex-col justify-center overflow-hidden border-t border-white/10 bg-[#0b0d10] px-6 py-28 text-[#f3f3ee] md:px-12 md:py-32"
+      className="relative isolate flex min-h-screen w-full flex-col justify-center overflow-hidden border-t border-white/10 bg-[#0b0d10] px-6 pt-20 pb-28 text-[#f3f3ee] md:px-12 md:pt-24 md:pb-32"
     >
       <div className="pointer-events-none absolute -right-40 top-12 h-96 w-96 rounded-full bg-white/[0.06] blur-[120px]" />
-      <div className="mx-auto mb-16 flex w-full max-w-7xl items-center justify-between border-b border-white/10 pb-6">
+      <div className="mx-auto mb-12 flex w-full max-w-7xl items-center justify-between border-b border-white/10 pb-6">
         <div className="flex items-center gap-3">
           <span className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-white">
             02 / About
@@ -178,10 +179,9 @@ export default function BioSection() {
             <span className="h-px w-8 bg-white" />
             Engineering meets expression
           </div>
-          <h2 className="max-w-3xl font-display text-4xl leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl">
-            I build useful things with{" "}
-            <span className="text-white">a human point of view.</span>
-          </h2>
+          <ScrollFloat containerClassName="max-w-3xl font-display text-4xl leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl">
+            I build useful things with a human point of view.
+          </ScrollFloat>
           <SpotlightCard className="rounded-2xl border border-white/10 bg-white/[0.035] p-6 sm:p-8">
             <p className="relative z-10 text-base leading-8 text-white/65 sm:text-lg">
               {BIO_SUMMARY.intro}

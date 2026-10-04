@@ -4,6 +4,7 @@ import { ArrowUpRight, X } from "lucide-react";
 import type { Project } from "../types";
 import FlexCarousel from "./FlexCarousel";
 import LiquidButton from "./LiquidButton";
+import ScrollFloat from "./ScrollFloat";
 
 const REPOSITORY_IMAGE_ASSETS = {
   ...import.meta.glob<string>("../../assets/[0-9]*.{png,jpg,jpeg,webp}", {
@@ -314,17 +315,17 @@ export default function ProjectsSection() {
   return (
     <section
       id="projects"
-      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#0b0d10] pt-24 pb-0 text-[#f3f3ee] md:pt-28"
+      className="relative isolate w-full overflow-hidden border-t border-white/10 bg-[#0b0d10] pt-20 pb-0 text-[#f3f3ee] md:pt-24"
     >
       <div className="pointer-events-none absolute -right-44 top-0 h-[34rem] w-[34rem] rounded-full bg-white/[0.045] blur-[140px]" />
-      <div className="relative mx-auto mb-10 flex w-full max-w-7xl flex-col justify-between gap-8 border-b border-white/10 px-6 pb-8 md:flex-row md:items-end md:px-12">
+      <div className="relative mx-auto mb-12 flex w-full max-w-7xl flex-col justify-between gap-8 border-b border-white/10 px-6 pb-6 md:flex-row md:items-end md:px-12">
         <div>
           <span className="font-mono text-xs uppercase tracking-[0.2em] text-white">
             04 / Selected work
           </span>
-          <h2 className="mt-5 font-display text-4xl tracking-tight sm:text-5xl">
+          <ScrollFloat containerClassName="mt-5 font-display text-4xl tracking-tight sm:text-5xl">
             A moving archive of work.
-          </h2>
+          </ScrollFloat>
           <p className="mt-4 max-w-xl text-sm leading-7 text-white/45">
             Drag, scroll, or focus a project to explore the collection.
           </p>

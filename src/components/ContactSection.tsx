@@ -4,6 +4,7 @@ import GlassSurface from "./GlassSurface";
 import SpotlightCard from "./SpotlightCard";
 import SlideCommit from "./SlideCommit";
 import TerminalSectionBackground from "./TerminalSectionBackground";
+import ScrollFloat from "./ScrollFloat";
 
 const CONTACT_EMAIL = "rabhadibyajyoti05@gmail.com";
 
@@ -47,9 +48,9 @@ export default function ContactSection() {
           <span className="font-mono text-xs uppercase tracking-[0.2em] text-white">
             05 / Contact
           </span>
-          <h2 className="mt-4 max-w-2xl font-display text-4xl tracking-tight sm:text-5xl">
+          <ScrollFloat containerClassName="mt-4 max-w-2xl font-display text-4xl tracking-tight sm:text-5xl">
             Good things start with hello.
-          </h2>
+          </ScrollFloat>
         </div>
         <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-white/35 md:block">
           Open to select collaborations
