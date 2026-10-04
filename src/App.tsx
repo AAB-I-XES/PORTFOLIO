@@ -16,6 +16,7 @@ import aboutMenuImage from "../assets/pic3.jpg";
 import skillsMenuImage from "../assets/Firefly_Gemini Flash_remove the person statue here 336738.png";
 import projectsMenuImage from "../assets/bg-im2.png";
 import contactMenuImage from "../assets/bg-im3.png";
+import { SEO_CONFIG, PERSON_SCHEMA, WEBSITE_SCHEMA } from "./seo/config";
 
 const navigationItems: StaggeredMenuItem[] = [
   { label: "Home", ariaLabel: "Go to home", link: "#hero" },
@@ -91,6 +92,63 @@ export default function App() {
     };
   }, [isLoading, prefersReducedMotion]);
 
+  useEffect(() => {
+    document.title = SEO_CONFIG.title;
+
+    const metaPairs: Array<[string, string]> = [
+      ["description", SEO_CONFIG.description],
+      ["og:title", SEO_CONFIG.title],
+      ["og:description", SEO_CONFIG.description],
+      ["og:url", SEO_CONFIG.siteUrl],
+      ["og:site_name", SEO_CONFIG.siteName],
+      ["og:locale", SEO_CONFIG.locale],
+      ["twitter:title", SEO_CONFIG.title],
+      ["twitter:description", SEO_CONFIG.description],
+    ];
+
+    for (const [name, value] of metaPairs) {
+      const selector = name.startsWith("og:") || name.startsWith("twitter:")
+        ? `meta[property="${name}"]` + `, meta[name="${name}"]`
+        : `meta[name="${name}"]`;
+      let element = document.head.querySelector(selector);
+      if (!element) {
+        element = document.createElement("meta");
+        if (name.startsWith("og:")) {
+          element.setAttribute("property", name);
+        } else if (name.startsWith("twitter:")) {
+          element.setAttribute("name", name);
+        } else {
+          element.setAttribute("name", name);
+        }
+        document.head.appendChild(element);
+      }
+      element.setAttribute("content", value);
+    }
+
+    let canonical = document.head.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", `${SEO_CONFIG.siteUrl}/`);
+
+    const existingScript = document.getElementById("dibrab-structured-data");
+    const script = document.createElement("script");
+    script.id = "dibrab-structured-data";
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify([
+      WEBSITE_SCHEMA,
+      PERSON_SCHEMA,
+    ]);
+
+    if (existingScript) {
+      existingScript.replaceWith(script);
+    } else {
+      document.head.appendChild(script);
+    }
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-x-clip select-none bg-[#ededed]">
 
@@ -149,74 +207,74 @@ export default function App() {
       <AnimatePresence>
         {(isExitingLoader || !isLoading) && (
           <>
-            {/* Navigation Header & Fullscreen Menu (positioned at z-50 to be 100% visible and interactive) */}
-            <StaggeredMenu
-              position="right"
-              items={navigationItems}
-              socialItems={socialItems}
-              displaySocials
-              displayItemNumbering
-              isFixed
-              closeOnClickAway
-              colors={["#3a3a3a", "#1d1d1d", "#080808"]}
-              menuButtonColor="#ffffff"
-              openMenuButtonColor="#ffffff"
-              accentColor="#d7d7d7"
-              onMenuOpen={() => setIsMenuOpen(true)}
-              onMenuClose={() => setIsMenuOpen(false)}
-              onItemSelect={handleMenuItemSelect}
-            />
+            <header>
+              <StaggeredMenu
+                position="right"
+                items={navigationItems}
+                socialItems={socialItems}
+                displaySocials
+                displayItemNumbering
+                isFixed
+                closeOnClickAway
+                colors={["#3a3a3a", "#1d1d1d", "#080808"]}
+                menuButtonColor="#ffffff"
+                openMenuButtonColor="#ffffff"
+                accentColor="#d7d7d7"
+                onMenuOpen={() => setIsMenuOpen(true)}
+                onMenuClose={() => setIsMenuOpen(false)}
+                onItemSelect={handleMenuItemSelect}
+              />
+            </header>
 
-            {/* Keep the smoother's fixed viewport wrapper outside animated transforms. */}
-            <div id="smooth-wrapper">
-              <div id="smooth-content">
-                {/* The Main Webpage Canvas */}
-                <motion.div
-                  initial={prefersReducedMotion
-                    ? { opacity: 0 }
-                    : {
-                        opacity: 0,
-                        scale: 1.035,
-                        y: 24,
-                        filter: "blur(14px)",
-                        clipPath: "inset(48% 0 48% round 24px)",
-                      }}
-                  animate={{
-                    opacity: 1,
-                    scale: isMenuOpen ? 0.94 : 1,
-                    y: isMenuOpen ? 24 : 0,
-                    filter: "blur(0px)",
-                    borderRadius: isMenuOpen ? "28px" : "0px",
-                    clipPath: "inset(0% 0% 0% round 0px)",
-                  }}
-                  transition={{ duration: prefersReducedMotion ? 0.2 : 1.65, ease: [0.16, 1, 0.3, 1] }}
-                  className="relative min-h-screen overflow-x-hidden shadow-2xl pointer-events-auto origin-center text-[#141414]"
-                  style={{ backgroundColor: "#ededed" }}
-                >
-                  {/* If menu is open, render a clean interceptor overlay to safely snap back on click with soft shadow */}
-                  {isMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.4 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="absolute inset-0 z-50 cursor-pointer pointer-events-auto bg-[#0a0a0a]"
+            <main id="main-content">
+              <div id="smooth-wrapper">
+                <div id="smooth-content">
+                  <motion.div
+                    initial={prefersReducedMotion
+                      ? { opacity: 0 }
+                      : {
+                          opacity: 0,
+                          scale: 1.035,
+                          y: 24,
+                          filter: "blur(14px)",
+                          clipPath: "inset(48% 0 48% round 24px)",
+                        }}
+                    animate={{
+                      opacity: 1,
+                      scale: isMenuOpen ? 0.94 : 1,
+                      y: isMenuOpen ? 24 : 0,
+                      filter: "blur(0px)",
+                      borderRadius: isMenuOpen ? "28px" : "0px",
+                      clipPath: "inset(0% 0% 0% round 0px)",
+                    }}
+                    transition={{ duration: prefersReducedMotion ? 0.2 : 1.65, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative min-h-screen overflow-x-hidden shadow-2xl pointer-events-auto origin-center text-[#141414]"
+                    style={{ backgroundColor: "#ededed" }}
+                  >
+                    {isMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.4 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="absolute inset-0 z-50 cursor-pointer pointer-events-auto bg-[#0a0a0a]"
+                      />
+                    )}
+
+                    <HeroSection
+                      onScrollToNext={handleScrollToNext}
+                      onScrollToContact={() => handleScrollToSection("contact")}
                     />
-                  )}
-
-                  <HeroSection
-                    onScrollToNext={handleScrollToNext}
-                    onScrollToContact={() => handleScrollToSection("contact")}
-                  />
-                  <BioSection />
-                  <SkillsSection />
-                  <ProjectsSection />
-                  <ContactSection />
-                  <Footer onScrollToTop={handleScrollToTop} />
-                </motion.div>
+                    <BioSection />
+                    <SkillsSection />
+                    <ProjectsSection />
+                    <ContactSection />
+                    <Footer onScrollToTop={handleScrollToTop} />
+                  </motion.div>
+                </div>
               </div>
-            </div>
+            </main>
           </>
         )}
       </AnimatePresence>

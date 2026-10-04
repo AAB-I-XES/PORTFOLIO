@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Dibyajyoti Rabha portfolio cover">
+  <defs>
+    <linearGradient id="panel" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f3f0ea"/>
+      <stop offset="100%" stop-color="#d8d8d4"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#171717"/>
+      <stop offset="100%" stop-color="#3b3b3b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#panel)"/>
+  <rect x="62" y="62" width="1076" height="506" rx="30" fill="url(#ink)"/>
+  <g opacity="0.16" stroke="#ffffff" stroke-width="1">
+    <path d="M120 182H1080M120 246H1080M120 310H1080M120 374H1080M120 438H1080"/>
+    <path d="M314 120V510M440 120V510M566 120V510M692 120V510M818 120V510M944 120V510"/>
+  </g>
+  <text x="118" y="180" fill="#ffffff" fill-opacity="0.7" font-size="24" font-family="Arial, Helvetica, sans-serif" letter-spacing="6">DIBRAB / CREATIVE DEVELOPER &amp; ILLUSTRATOR</text>
+  <text x="118" y="335" fill="#ffffff" font-size="94" font-family="Georgia, serif" font-weight="700">DIBYAJYOTI</text>
+  <text x="118" y="420" fill="#ffffff" font-size="94" font-family="Georgia, serif" font-weight="700">RABHA</text>
+  <text x="118" y="485" fill="#ffffff" fill-opacity="0.78" font-size="30" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">WEB • MOBILE • ILLUSTRATION • PRODUCT DESIGN</text>
+  <circle cx="975" cy="234" r="150" fill="#f5f2eb" fill-opacity="0.12"/>
+  <path d="M920 297V171h32l42 72 42-72h32v126h-28V219l-46 79h-12l-46-79v78h-28z" fill="#f5f2eb"/>
+</svg>
