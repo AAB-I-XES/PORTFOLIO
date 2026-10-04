@@ -1,7 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { ArrowUpRight, X } from "lucide-react";
 import type { Project } from "../types";
 import FlexCarousel from "./FlexCarousel";
 import LiquidButton from "./LiquidButton";
+
+const REPOSITORY_IMAGE_ASSETS = {
+  ...import.meta.glob<string>("../../assets/[0-9]*.{png,jpg,jpeg,webp}", {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+  ...import.meta.glob<string>("../../assets/{MESHCONNECT,PX3115,px3115}.{png,jpg,jpeg,webp}", {
+    eager: true,
+    query: "?url",
+    import: "default",
+  }),
+};
+
+const REPOSITORY_IMAGES = Object.entries(REPOSITORY_IMAGE_ASSETS).reduce<Record<string, string>>((images, [path, src]) => {
+  const filename = path.split("/").pop() ?? "";
+  const repositoryName = filename.replace(/^\d+_/, "").replace(/\.[^.]+$/, "");
+  const key = repositoryName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  images[key] = src;
+  return images;
+}, {});
+
+const REPOSITORY_IMAGE_ALIASES: Record<string, string> = {
+  px3115controller: "px3115",
+};
 
 type ProjectFilter = "all" | "originals" | "forks";
 
@@ -13,6 +40,7 @@ interface GitHubRepository {
   description: string | null;
   topics: string[];
   html_url: string;
+  homepage: string | null;
   stargazers_count: number;
   forks_count: number;
 }
@@ -106,6 +134,7 @@ function isRepository(value: unknown): value is GitHubRepository {
     && (typeof repo.language === "string" || repo.language === null)
     && (typeof repo.description === "string" || repo.description === null)
     && typeof repo.html_url === "string"
+    && (typeof repo.homepage === "string" || repo.homepage === null)
     && typeof repo.stargazers_count === "number"
     && typeof repo.forks_count === "number"
     && Array.isArray(repo.topics)
@@ -131,6 +160,7 @@ function mapRepository(repo: GitHubRepository, index: number): Project {
     accentColor: accentColors[index % accentColors.length] ?? "#ffffff",
     isFeatured: !isFork && repo.stargazers_count > 0,
     htmlUrl: repo.html_url,
+    homepage: repo.homepage || undefined,
     stars: repo.stargazers_count,
     forks: repo.forks_count,
     isFork,
@@ -187,6 +217,7 @@ export default function ProjectsSection() {
   const [filter, setFilter] = useState<ProjectFilter>("all");
   const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [expandedProjectIndex, setExpandedProjectIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
 
@@ -251,22 +282,33 @@ export default function ProjectsSection() {
     [filter, projects],
   );
   const carouselItems = useMemo(
-    () => filteredProjects.map((project) => ({
-      src: getPreviewSources(project).src,
-      alt: `${project.title} project preview`,
-      title: project.title,
-      subtitle: project.category,
-    })),
+    () => filteredProjects.map((project) => {
+      const projectKey = project.title.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const imageKey = REPOSITORY_IMAGE_ALIASES[projectKey] ?? projectKey;
+      return {
+        src: REPOSITORY_IMAGES[imageKey] ?? getPreviewSources(project).src,
+        alt: `${project.title} project preview`,
+        title: project.title,
+        subtitle: project.category,
+      };
+    }),
     [filteredProjects],
   );
+  const expandedProject = expandedProjectIndex === null
+    ? null
+    : filteredProjects[expandedProjectIndex] ?? null;
 
   const chooseFilter = (nextFilter: ProjectFilter) => {
     setFilter(nextFilter);
     setActiveIndex(0);
+    setExpandedProjectIndex(null);
   };
 
   const selectProject = (index: number) => {
     setActiveIndex(index);
+  };
+  const openProjectDetails = (index: number) => {
+    setExpandedProjectIndex(index);
   };
 
   return (
@@ -318,23 +360,118 @@ export default function ProjectsSection() {
 
       {filteredProjects.length > 0 ? (
         <div className="relative w-full">
-          <FlexCarousel
-            items={carouselItems}
-            preset="liquid"
-            intro="rise"
-            fit="landscape"
-            cardHeight={0.58}
-            gap={18}
-            radius={12}
-            squeeze={0.12}
-            dispersion={0.04}
-            followCursor
-            focusOnClick
-            captions
-            onChange={selectProject}
-            className="text-white"
-            style={{ height: "min(72vh, 760px)", minHeight: "380px" }}
-          />
+          <div className={`mx-auto grid w-full items-center transition-[grid-template-columns] duration-500 ${expandedProject
+            ? "max-w-7xl grid-cols-1 gap-x-7 gap-y-8 px-6 md:px-12 lg:grid-cols-[minmax(13rem,0.82fr)_minmax(0,2.2fr)_minmax(13rem,0.72fr)]"
+            : "grid-cols-1"
+          }`}>
+            <aside className={expandedProject ? "min-w-0 lg:border-r lg:border-white/10 lg:pr-6" : "hidden"}>
+              <AnimatePresence mode="wait">
+                {expandedProject && (
+                  <motion.div
+                    key={expandedProject.id}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/45">
+                          {expandedProject.category} / {expandedProject.year}
+                        </span>
+                        <h3 className="mt-3 break-words font-display text-2xl text-white sm:text-3xl">
+                          {expandedProject.title}
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedProjectIndex(null)}
+                        aria-label="Close project details"
+                        className="grid h-9 w-9 shrink-0 place-items-center border border-white/15 text-white/65 transition hover:border-white hover:text-white"
+                      >
+                        <X className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                    </div>
+                    <p className="mt-5 text-sm leading-7 text-white/65">
+                      {expandedProject.description}
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {expandedProject.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="border border-white/10 px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.08em] text-white/55"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </aside>
+
+            <FlexCarousel
+              items={carouselItems}
+              preset="liquid"
+              intro="rise"
+              fit="landscape"
+              cardHeight={0.58}
+              gap={18}
+              radius={12}
+              squeeze={0.12}
+              dispersion={0.04}
+              followCursor
+              focusOnClick
+              captions
+              onChange={selectProject}
+              onSelect={openProjectDetails}
+              onNavigate={() => setExpandedProjectIndex(null)}
+              className="min-w-0 text-white"
+              style={{ height: "min(72vh, 760px)", minHeight: "380px" }}
+            />
+
+            <aside className={expandedProject ? "min-w-0 lg:border-l lg:border-white/10 lg:pl-6" : "hidden"}>
+              <AnimatePresence mode="wait">
+                {expandedProject && (
+                  <motion.div
+                    key={expandedProject.id}
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
+                      Project links
+                    </span>
+                    <div className="mt-4 flex flex-col">
+                      {expandedProject.homepage && (
+                        <a
+                          href={expandedProject.homepage}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-between border-b border-white/10 py-4 text-sm text-white/75 transition hover:text-white"
+                        >
+                          Live project
+                          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                        </a>
+                      )}
+                      {expandedProject.htmlUrl && (
+                        <a
+                          href={expandedProject.htmlUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-between border-b border-white/10 py-4 text-sm text-white/75 transition hover:text-white"
+                        >
+                          Source repository
+                          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                        </a>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </aside>
+          </div>
 
           {isUsingFallback && (
             <p className="mt-4 text-center font-mono text-[9px] uppercase tracking-[0.13em] text-white/30">

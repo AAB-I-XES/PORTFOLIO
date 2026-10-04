@@ -10,6 +10,7 @@ export interface Project {
   accentColor: string;
   isFeatured?: boolean;
   htmlUrl?: string;
+  homepage?: string;
   stars?: number;
   forks?: number;
   isFork?: boolean;

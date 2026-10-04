@@ -282,6 +282,7 @@ const FlexCarousel = ({
   captureWheel = true,
   onChange = undefined,
   onSelect = undefined,
+  onNavigate = undefined,
   className = '',
   style
 }) => {
@@ -289,7 +290,7 @@ const FlexCarousel = ({
   const settingsRef = useRef(null);
   const itemsRef = useRef(items);
   const engineRef = useRef(null);
-  const callbacksRef = useRef({ onChange, onSelect });
+  const callbacksRef = useRef({ onChange, onSelect, onNavigate });
   const [active, setActive] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [focusOpen, setFocusOpen] = useState(false);
@@ -302,7 +303,7 @@ const FlexCarousel = ({
 
   useEffect(() => {
     itemsRef.current = list;
-    callbacksRef.current = { onChange, onSelect };
+    callbacksRef.current = { onChange, onSelect, onNavigate };
     settingsRef.current = {
       intro,
       cardHeight,
@@ -1032,6 +1033,7 @@ const FlexCarousel = ({
           }
           if (Math.abs(dx) > slop) {
             pointer.dragging = true;
+            callbacksRef.current.onNavigate?.();
             pointer.startX = x;
             pointer.startPos = pos;
             closeFocus();
@@ -1085,8 +1087,8 @@ const FlexCarousel = ({
       const [x, y] = localPoint(e);
       const hit = instances.find(inst => x >= inst.x0 && x <= inst.x1 && y >= inst.y0 && y <= inst.y1);
       if (!hit) return;
+      callbacksRef.current.onSelect?.(hit.index, itemsRef.current[hit.index]);
       if (hit.index === activeIndex && Math.abs(goal - pos) < 2) {
-        callbacksRef.current.onSelect?.(hit.index, itemsRef.current[hit.index]);
         if (s.focusOnClick) openFocus(hit.index);
       } else {
         const rel = (hit.x0 + hit.x1) / 2 - width / 2;
@@ -1127,6 +1129,7 @@ const FlexCarousel = ({
       const horizontal = Math.abs(dx) > Math.abs(dy);
       if (!horizontal && !s.captureWheel) return;
       e.preventDefault();
+      callbacksRef.current.onNavigate?.();
       skipIntro();
       interactedAt = performance.now();
       if (closeFocus()) return;
@@ -1143,25 +1146,30 @@ const FlexCarousel = ({
       const m = metrics(s);
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
+        callbacksRef.current.onNavigate?.();
         skipIntro();
         closeFocus();
         interactedAt = performance.now();
         step(m, 1);
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         e.preventDefault();
+        callbacksRef.current.onNavigate?.();
         skipIntro();
         closeFocus();
         interactedAt = performance.now();
         step(m, -1);
       } else if (e.key === 'Home') {
         e.preventDefault();
+        callbacksRef.current.onNavigate?.();
         closeFocus();
         goTo(m, 0);
       } else if (e.key === 'End') {
         e.preventDefault();
+        callbacksRef.current.onNavigate?.();
         closeFocus();
         goTo(m, slots.length - 1);
       } else if (e.key === 'Escape') {
+        callbacksRef.current.onNavigate?.();
         if (closeFocus()) e.preventDefault();
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
